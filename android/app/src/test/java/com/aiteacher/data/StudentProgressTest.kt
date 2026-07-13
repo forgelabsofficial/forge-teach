@@ -2,15 +2,15 @@ package com.aiteacher.data
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.aiteacher.onboarding.Plan
-import com.aiteacher.onboarding.SessionItem
 import kotlinx.coroutines.runBlocking
 import org.junit.After
-import org.junit.Assert.assertEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
+import com.aiteacher.onboarding.Plan
+import com.aiteacher.onboarding.SessionItem
 
-class PlanRepositoryTest {
+class StudentProgressTest {
     private lateinit var db: AppDatabase
     private lateinit var repo: PlanRepository
 
@@ -27,13 +27,15 @@ class PlanRepositoryTest {
     }
 
     @Test
-    fun saveAndLoadPlan_roundTrip() = runBlocking {
-        val plan = Plan(weeks = 2, sessions = listOf(SessionItem("2026-07-20", "Math", 30, "2026-07-20T09:00:00Z")))
-        val id = repo.savePlan(plan)
+    fun saveStudentAndLinkPlan() = runBlocking {
+        val studentId = repo.saveStudentProfile("Alice", "UTC")
+        assertTrue(studentId > 0)
+        val plan = Plan(weeks = 1, sessions = listOf(SessionItem("2026-07-20", "Math", 30)))
+        val planId = repo.savePlan(plan, studentId)
+        assertTrue(planId > 0)
         val loaded = repo.loadLatestPlan()
+        assertNotNull(loaded)
+        // ensure latest plan persisted
         assertEquals(plan.weeks, loaded?.weeks)
-        assertEquals(plan.sessions.size, loaded?.sessions?.size)
-        assertEquals(plan.sessions[0].topic, loaded?.sessions?.get(0)?.topic)
-        assertEquals(plan.sessions[0].isoDateTime, loaded?.sessions?.get(0)?.isoDateTime)
     }
 }

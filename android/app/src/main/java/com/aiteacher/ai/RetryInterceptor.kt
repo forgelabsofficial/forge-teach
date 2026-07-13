@@ -23,6 +23,16 @@ class RetryInterceptor(private val maxRetries: Int = 3, private val baseDelayMs:
                     Thread.sleep(backoff)
                     continue
                 }
+                // Retry on 429 Too Many Requests, honoring Retry-After header when present
+                if (response.code == 429) {
+                    response.close()
+                    attempt++
+                    val retryAfter = response.headers["Retry-After"]?.toLongOrNull()
+                    val backoff = retryAfter?.times(1000) ?: computeBackoff(attempt)
+                    Log.w("RetryInterceptor", "Rate limited (429). Retrying in ${backoff}ms (attempt=$attempt)")
+                    Thread.sleep(backoff)
+                    continue
+                }
                 return response
             } catch (ioe: IOException) {
                 lastEx = ioe

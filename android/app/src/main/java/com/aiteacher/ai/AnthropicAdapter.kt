@@ -14,11 +14,16 @@ class AnthropicAdapter(private val apiKey: String, private val baseUrl: String? 
             val api = AnthropicApi.create(apiKey, baseUrl ?: "https://api.anthropic.com/")
             val payload = OpenAiRequest(model = "anthropic-1", input = mapOf("assessment" to assessment))
             val resp = api.generate(payload)
-            val planDto = resp.plan
-            if (planDto != null) {
-                val sessions = planDto.sessions.map { SessionItem(date = it.date, topic = it.topic, duration = it.duration, isoDateTime = it.dateTime) }
-                return@withContext Plan(weeks = planDto.weeks, sessions = sessions)
-            }
+            val parsed = ResponseParser.parsePlanFromOpenAiResponse(resp)
+            if (parsed != null) return@withContext parsed
+
+            // fallback: try raw JSON
+            try {
+                val gson = com.google.gson.Gson()
+                val json = gson.toJson(resp)
+                val p2 = ResponseParser.parsePlanFromJsonString(json)
+                if (p2 != null) return@withContext p2
+            } catch (_: Exception) {}
         } catch (e: Exception) {
             Log.w("AnthropicAdapter", "Error generating plan: ${e.message}")
         }

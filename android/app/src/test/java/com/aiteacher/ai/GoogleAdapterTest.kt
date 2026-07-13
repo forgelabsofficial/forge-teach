@@ -47,4 +47,36 @@ class GoogleAdapterTest {
         assertEquals(1, plan.sessions.size)
         assertEquals("History", plan.sessions[0].topic)
     }
+
+    @Test
+    fun retriesOn429_thenSucceeds() = runBlocking {
+        val planJson = """
+        {
+          "plan": {
+            "weeks": 2,
+            "sessions": [ { "date": "2026-07-23", "topic": "Geography", "duration": 30 } ]
+          }
+        }
+        """
+        server.enqueue(MockResponse().setResponseCode(429).addHeader("Retry-After", "1"))
+        server.enqueue(MockResponse().setResponseCode(200).setBody(planJson))
+
+        val baseUrl = server.url("/").toString()
+        val adapter = GoogleAdapter(apiKey = "test", baseUrl = baseUrl)
+        val assessment = Assessment(user = "Student", topics = listOf(Topic("t1","Geography",true)), availability = emptyMap(), prefs = com.aiteacher.onboarding.Preferences(30))
+        val plan = adapter.generatePlan(ApplicationProvider.getApplicationContext(), assessment)
+        assertEquals(2, plan.weeks)
+        assertEquals(1, plan.sessions.size)
+        assertEquals("Geography", plan.sessions[0].topic)
+    }
+
+    @Test
+    fun malformedJsonFallsbackToMock() = runBlocking {
+        server.enqueue(MockResponse().setResponseCode(200).setBody("{ bad json }"))
+        val baseUrl = server.url("/").toString()
+        val adapter = GoogleAdapter(apiKey = "test", baseUrl = baseUrl)
+        val assessment = Assessment(user = "Student", topics = listOf(Topic("t1","X",true)), availability = emptyMap(), prefs = com.aiteacher.onboarding.Preferences(30))
+        val plan = adapter.generatePlan(ApplicationProvider.getApplicationContext(), assessment)
+        assertEquals(4, plan.weeks)
+    }
 }

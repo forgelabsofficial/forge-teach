@@ -15,5 +15,6 @@ data class SessionEntity(
     val isoDateTime: String? = null,
     val topic: String,
     val duration: Int,
-    val completed: Boolean = false
+    val completed: Boolean = false,
+    val status: String = "scheduled"
 )

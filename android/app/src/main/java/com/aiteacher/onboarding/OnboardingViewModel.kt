@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import com.aiteacher.ai.ModelInfo
 import com.aiteacher.ai.ModelRegistry
 import com.aiteacher.security.SecureStorage
+import android.content.Context
 
 class OnboardingViewModel : ViewModel() {
     private val _name = MutableStateFlow("")
@@ -35,6 +36,14 @@ class OnboardingViewModel : ViewModel() {
 
     private val _selectedModel = MutableStateFlow<String?>(null)
     val selectedModel: StateFlow<String?> = _selectedModel
+
+    // schema-driven onboarding
+    private val _schema = MutableStateFlow<com.aiteacher.onboarding.AssessmentSchema?>(null)
+    val schema: StateFlow<com.aiteacher.onboarding.AssessmentSchema?> = _schema
+
+    // raw answers mapped by question id
+    private val _answers = MutableStateFlow<Map<String, Any?>>(emptyMap())
+    val answers: StateFlow<Map<String, Any?>> = _answers
 
     fun setName(n: String) { _name.value = n }
 
@@ -71,7 +80,44 @@ class OnboardingViewModel : ViewModel() {
         }
     }
 
+    fun loadAssessmentSchema(context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val s = AssessmentSchemaLoader.loadFromAssets(context)
+                _schema.value = s
+            } catch (e: Exception) {
+                // ignore
+            }
+        }
+    }
+
+    fun setAnswer(questionId: String, value: Any?) {
+        _answers.value = _answers.value.toMutableMap().also { it[questionId] = value }
+    }
+
     fun buildAssessment(): Assessment {
+        // If schema/answers present, build from answers
+        val s = _schema.value
+        val a = _answers.value
+        if (s != null && a.isNotEmpty()) {
+            val user = (a["q_name"] as? String)?.ifBlank { "Student" } ?: _name.value.ifBlank { "Student" }
+            val topics = mutableListOf<Topic>()
+            val goals = a["q_goals"] as? List<*>
+            if (goals != null) {
+                goals.forEach { g ->
+                    val id = g as? String ?: return@forEach
+                    val opt = s.questions.flatMap { it.options ?: emptyList() }.firstOrNull { it.id == id }
+                    topics.add(Topic(id = id, name = opt?.label ?: id, selected = true))
+                }
+            } else {
+                // fallback to selected topics
+                topics.addAll(_topics.value.filter { it.selected })
+            }
+            val availability = (a["q_availability"] as? String)?.let { parseAvailabilityString(it) } ?: mapOf("mon" to listOf("18:00-19:00"))
+            val sessionLen = (a["q_session_length"] as? String)?.toIntOrNull() ?: 30
+            return Assessment(user = user, topics = topics, availability = availability, prefs = Preferences(sessionLength = sessionLen))
+        }
+
         val selected = _topics.value.filter { it.selected }
         val availability = mapOf("mon" to listOf("18:00-19:00"))
         return Assessment(
@@ -80,5 +126,29 @@ class OnboardingViewModel : ViewModel() {
             availability = availability,
             prefs = Preferences(sessionLength = 30)
         )
+    }
+
+    // Build a preview Plan using the TimetableEngine. Returns null on error.
+    fun generatePreviewPlan(weeks: Int = 4): Plan? {
+        return try {
+            val a = buildAssessment()
+            // check for timezone override
+            val tz = (_answers.value["q_timezone"] as? String)?.takeIf { it.isNotBlank() }
+            val zone = try { if (tz != null) ZoneId.of(tz) else null } catch (e: Exception) { null }
+            if (zone != null) TimetableEngine.generateSchedule(a, weeks = weeks, zone = zone) else TimetableEngine.generateSchedule(a, weeks = weeks)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    private fun parseAvailabilityString(s: String): Map<String, List<String>> {
+        // Very small parser: expects lines like "mon: 18:00-19:00, wed: 18:00-19:00"
+        return s.split("\n", ",").mapNotNull { part ->
+            val p = part.trim()
+            if (p.isBlank()) return@mapNotNull null
+            val kv = p.split(":").map { it.trim() }
+            if (kv.size < 2) return@mapNotNull null
+            kv[0] to kv[1].split(";").map { it.trim() }
+        }.toMap()
     }
 }

@@ -11,6 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.Alignment
+import kotlinx.coroutines.launch
+import com.aiteacher.data.PlanRepository
+import com.aiteacher.work.ScheduleManager
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -20,12 +29,21 @@ fun OnboardingScreen(
     vm: OnboardingViewModel = viewModel(),
     onContinue: (Assessment) -> Unit = {}
 ) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    // load schema once
+    androidx.compose.runtime.LaunchedEffect(Unit) { vm.loadAssessmentSchema(ctx) }
     val name by vm.name.collectAsState()
     val topics by vm.topics.collectAsState()
     val provider by vm.provider.collectAsState()
     val apiKey by vm.apiKey.collectAsState()
     val models by vm.models.collectAsState()
     val selectedModel by vm.selectedModel.collectAsState()
+
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+
+    var previewPlan by remember { mutableStateOf<com.aiteacher.onboarding.Plan?>(null) }
+    var showPreview by remember { mutableStateOf(false) }
 
     Surface(modifier = Modifier.fillMaxWidth().padding(12.dp), shape = androidx.compose.material3.MaterialTheme.shapes.medium) {
         Column(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -62,25 +80,34 @@ fun OnboardingScreen(
             }
 
             Text(text = "Create Student Profile", style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
-            OutlinedTextField(value = name, onValueChange = { vm.setName(it) }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    // If schema loaded, render dynamic form
+                    val schema by vm.schema.collectAsState()
+                    val answers by vm.answers.collectAsState()
+                    val mutableAnswers = androidx.compose.runtime.remember { answers.toMutableMap() }
+                    if (schema != null) {
+                        com.aiteacher.onboarding.DynamicForm(schema!!, mutableAnswers)
+                        OutlinedTextField(value = name, onValueChange = { vm.setName(it) }, label = { Text("Name (override)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                    } else {
+                        OutlinedTextField(value = name, onValueChange = { vm.setName(it) }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
 
-            Text(text = "Choose topics", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-                items(topics.size) { idx ->
-                    val t = topics[idx]
-                    val selected = t.selected
-                    androidx.compose.material3.Card(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clickable { vm.toggleTopic(t.id) },
-                        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = if (selected) androidx.compose.ui.graphics.Color(0xFF2563EB) else androidx.compose.ui.graphics.Color(0xFFF8FAFC))
-                    ) {
-                        Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
-                            Text(text = t.name, color = if (selected) androidx.compose.ui.graphics.Color.White else androidx.compose.ui.graphics.Color(0xFF111827))
+                        Text(text = "Choose topics", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                            items(topics.size) { idx ->
+                                val t = topics[idx]
+                                val selected = t.selected
+                                androidx.compose.material3.Card(
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .clickable { vm.toggleTopic(t.id) },
+                                    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = if (selected) androidx.compose.ui.graphics.Color(0xFF2563EB) else androidx.compose.ui.graphics.Color(0xFFF8FAFC))
+                                ) {
+                                    Box(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                        Text(text = t.name, color = if (selected) androidx.compose.ui.graphics.Color.White else androidx.compose.ui.graphics.Color(0xFF111827))
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            }
 
             Text(text = "Availability (sample)", style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -89,9 +116,73 @@ fun OnboardingScreen(
             }
 
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-                androidx.compose.material3.Button(onClick = { onContinue(vm.buildAssessment()) }) { Text("Continue") }
+                androidx.compose.material3.Button(onClick = {
+                    // persist dynamic answers to VM if present
+                    if (schema != null) {
+                        mutableAnswers.forEach { (k, v) -> vm.setAnswer(k, v) }
+                    }
+                    // generate a preview schedule and show it to the user
+                    val preview = vm.generatePreviewPlan()
+                    if (preview != null) {
+                        previewPlan = preview
+                        showPreview = true
+                    } else {
+                        // no preview available — continue as before
+                        onContinue(vm.buildAssessment())
+                    }
+                }) { Text("Continue") }
                 androidx.compose.material3.OutlinedButton(onClick = { /* save draft - implement later */ }) { Text("Save draft") }
             }
         }
+    }
+
+    if (showPreview && previewPlan != null) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showPreview = false },
+            title = { Text("Preview Learning Plan", style = androidx.compose.material3.MaterialTheme.typography.titleMedium) },
+            text = {
+                Column(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                    Text("Here is a preview of your scheduled sessions:", style = androidx.compose.material3.MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyColumn(modifier = Modifier.height(220.dp)) {
+                        items(previewPlan!!.sessions) { s ->
+                            androidx.compose.material3.Card(modifier = Modifier.fillMaxWidth().padding(4.dp), elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    Text(text = s.topic, style = androidx.compose.material3.MaterialTheme.typography.titleSmall)
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(text = "Date: ${s.date}")
+                                    if (!s.isoDateTime.isNullOrBlank()) Text(text = "Time: ${s.isoDateTime}")
+                                    Text(text = "Duration: ${s.duration} min")
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    // persist plan and schedule notifications
+                    coroutineScope.launch {
+                        val repo = PlanRepository(ctx.applicationContext)
+                        // persist student profile and link to plan
+                        val studentName = vm.name.collectAsState().value.ifBlank { "Student" }
+                        val tz = vm.answers.collectAsState().value["q_timezone"] as? String
+                        val studentId = repo.saveStudentProfile(studentName, tz)
+                        repo.savePlan(previewPlan!!, studentId)
+                        ScheduleManager.schedulePlanNotifications(ctx.applicationContext, previewPlan!!)
+                        showPreview = false
+                        // show a short toast confirmation
+                        android.widget.Toast.makeText(ctx, "Plan saved and notifications scheduled", android.widget.Toast.LENGTH_SHORT).show()
+                        onContinue(vm.buildAssessment())
+                    }
+                }) { Text("Accept & Continue") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    showPreview = false
+                    onContinue(vm.buildAssessment())
+                }) { Text("Skip") }
+            }
+        )
     }
 }

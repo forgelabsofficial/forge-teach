@@ -19,6 +19,10 @@ interface PlanDao {
     @Query("SELECT * FROM plans ORDER BY id DESC LIMIT 1")
     suspend fun getLatestPlan(): PlanWithSessions?
 
+    @Transaction
+    @Query("SELECT * FROM plans WHERE studentId = :studentId ORDER BY id DESC")
+    suspend fun getPlansForStudent(studentId: Long): List<PlanWithSessions>
+
     @Query("SELECT * FROM sessions WHERE planId = :planId")
     suspend fun getSessionsForPlan(planId: Long): List<SessionEntity>
 }

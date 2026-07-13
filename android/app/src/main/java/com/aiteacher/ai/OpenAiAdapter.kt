@@ -31,31 +31,18 @@ class OpenAiAdapter(private val apiKey: String, private val baseUrl: String? = n
             )
 
             val resp = api.chat(body)
+            // First, try typed parsing
+            val parsed = ResponseParser.parsePlanFromOpenAiResponse(resp)
+            if (parsed != null) return@withContext parsed
 
-            // resp should follow OpenAI chat completion shape; extract assistant message content and parse plan
-            val assistantContent = resp.choices?.firstOrNull()?.message?.content
-            if (!assistantContent.isNullOrBlank()) {
-                try {
-                    val gson = com.google.gson.Gson()
-                    val root = gson.fromJson(assistantContent, com.google.gson.JsonObject::class.java)
-                    if (root.has("plan")) {
-                        val planObj = root.getAsJsonObject("plan")
-                        val weeks = planObj.getAsJsonPrimitive("weeks")?.asInt ?: 4
-                        val sessionsJson = planObj.getAsJsonArray("sessions")
-                        val sessions = sessionsJson.map { el ->
-                            val o = el.asJsonObject
-                            val date = if (o.has("date")) o.get("date").asString else ""
-                            val topic = if (o.has("topic")) o.get("topic").asString else "Lesson"
-                            val duration = if (o.has("duration")) o.get("duration").asInt else assessment.prefs.sessionLength
-                            val dateTime = if (o.has("dateTime")) o.get("dateTime").asString else null
-                            SessionItem(date = date, topic = topic, duration = duration, isoDateTime = dateTime)
-                        }
-                        return@withContext Plan(weeks = weeks, sessions = sessions)
-                    }
-                } catch (e: Exception) {
-                    // fall through to mock
-                }
-            }
+            // Second, attempt to extract a raw JSON plan if the provider returned assistant-like content
+            // Convert raw response object back to JSON string via Gson (fallback path)
+            try {
+                val gson = com.google.gson.Gson()
+                val json = gson.toJson(resp)
+                val parsed2 = ResponseParser.parsePlanFromJsonString(json)
+                if (parsed2 != null) return@withContext parsed2
+            } catch (_: Exception) {}
 
             // Fallback: use the mock deterministic plan
             AiClientMock.generatePlan(assessment)
