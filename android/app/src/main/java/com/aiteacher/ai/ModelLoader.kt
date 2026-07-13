@@ -25,7 +25,7 @@ class GenericModelLoader(private val baseUrl: String, private val authHeader: Pa
             try {
                 val url = if (baseUrl.endsWith("/")) baseUrl.dropLast(1) + path else baseUrl + path
                 val req = Request.Builder().url(url)
-                    .addHeader(authHeader.first, "${authHeader.second} $apiKey")
+                    .addHeader(authHeader.first, if (authHeader.second.isBlank()) apiKey else "${authHeader.second} $apiKey")
                     .get()
                     .build()
                 val resp = client.newCall(req).execute()

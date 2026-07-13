@@ -13,30 +13,49 @@ class GoogleModelLoader(private val baseUrl: String = "https://generativelanguag
     private val gson = Gson()
 
     override suspend fun listModels(apiKey: String): List<ModelInfo> {
+        // delegate to GenericModelLoader which tries multiple common paths and shapes
         try {
-            // Google may require projects/.. path; try /v1/models
-            val url = if (baseUrl.endsWith("/")) baseUrl.dropLast(1) + "/v1/models" else baseUrl + "/v1/models"
-            val req = Request.Builder().url(url)
-                .addHeader("Authorization", "Bearer $apiKey")
-                .get()
-                .build()
-            val resp = client.newCall(req).execute()
-            val body = resp.body?.string() ?: return emptyList()
-            if (!resp.isSuccessful) return emptyList()
-            val json = gson.fromJson(body, com.google.gson.JsonObject::class.java)
-            val out = mutableListOf<ModelInfo>()
-            // Google may return {"models": ["...", ...]} or complex object
-            if (json.has("models") && json.get("models").isJsonArray) {
-                val arr = json.getAsJsonArray("models")
-                arr.forEach { el ->
-                    if (el.isJsonPrimitive) out.add(ModelInfo(el.asString))
-                    else if (el.isJsonObject && el.asJsonObject.has("name")) out.add(ModelInfo(el.asJsonObject.get("name").asString))
-                }
+            val g = GenericModelLoader(baseUrl, Pair("Authorization", "Bearer"))
+            val found = g.listModels(apiKey)
+            if (found.isNotEmpty()) return found
+        } catch (e: Exception) {
+            Log.w("GoogleModelLoader", "generic loader failed: ${e.message}")
+        }
+
+        // fallback: try a few Google-specific variants
+        try {
+            val candidate = listOf("/v1/models", "/models", "/v1/projects/-/models")
+            for (path in candidate) {
+                try {
+                    val url = if (baseUrl.endsWith("/")) baseUrl.dropLast(1) + path else baseUrl + path
+                    val req = Request.Builder().url(url)
+                        .addHeader("Authorization", "Bearer $apiKey")
+                        .get()
+                        .build()
+                    val resp = client.newCall(req).execute()
+                    val body = resp.body?.string() ?: continue
+                    if (!resp.isSuccessful) continue
+                    val json = gson.fromJson(body, com.google.gson.JsonElement::class.java)
+                    val out = mutableListOf<ModelInfo>()
+                    if (json.isJsonObject) {
+                        val obj = json.asJsonObject
+                        if (obj.has("models") && obj.get("models").isJsonArray) {
+                            obj.getAsJsonArray("models").forEach { el ->
+                                if (el.isJsonPrimitive) out.add(ModelInfo(el.asString))
+                                else if (el.isJsonObject && el.asJsonObject.has("name")) out.add(ModelInfo(el.asJsonObject.get("name").asString))
+                            }
+                        }
+                    } else if (json.isJsonArray) {
+                        json.asJsonArray.forEach { el ->
+                            if (el.isJsonPrimitive) out.add(ModelInfo(el.asString))
+                        }
+                    }
+                    if (out.isNotEmpty()) return out
+                } catch (_: Exception) {}
             }
-            return out
         } catch (e: Exception) {
             Log.w("GoogleModelLoader", "error listing models: ${e.message}")
-            return emptyList()
         }
+        return emptyList()
     }
 }

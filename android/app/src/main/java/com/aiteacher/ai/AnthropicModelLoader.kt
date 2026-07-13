@@ -6,13 +6,22 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 
 /**
- * Anthropic-specific model loader. Many Anthropic APIs expose /v1/models or /v1/engines.
+ * Anthropic-specific model loader. Delegates to `GenericModelLoader` for broader coverage
+ * and falls back to classic /v1/models parsing if needed.
  */
 class AnthropicModelLoader(private val baseUrl: String = "https://api.anthropic.com") : ModelLoader {
     private val client = OkHttpClient()
     private val gson = Gson()
 
     override suspend fun listModels(apiKey: String): List<ModelInfo> {
+        try {
+            val g = GenericModelLoader(baseUrl, Pair("x-api-key", ""))
+            val found = g.listModels(apiKey)
+            if (found.isNotEmpty()) return found
+        } catch (e: Exception) {
+            Log.w("AnthropicModelLoader", "generic loader failed: ${e.message}")
+        }
+
         try {
             val url = if (baseUrl.endsWith("/")) baseUrl.dropLast(1) + "/v1/models" else baseUrl + "/v1/models"
             val req = Request.Builder().url(url)

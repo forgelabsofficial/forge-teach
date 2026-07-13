@@ -5,6 +5,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import java.io.IOException
 import kotlin.math.min
+import kotlin.random.Random
 
 class RetryInterceptor(private val maxRetries: Int = 3, private val baseDelayMs: Long = 300) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -48,6 +49,9 @@ class RetryInterceptor(private val maxRetries: Int = 3, private val baseDelayMs:
     private fun computeBackoff(attempt: Int): Long {
         val exp = 1 shl (attempt - 1)
         val delay = baseDelayMs * exp
-        return min(delay, 10_000L)
+        val capped = min(delay, 10_000L)
+        // add jitter up to 30% of capped delay
+        val jitter = (capped * 0.3).toLong()
+        return capped - jitter + Random.nextLong(0, jitter + 1)
     }
 }
