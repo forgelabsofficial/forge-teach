@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+# Gradle wrapper
+if [ -z "$JAVA_HOME" ]; then
+  echo "WARNING: JAVA_HOME is not set. Gradle may not run properly."
+fi
+DIRNAME="`dirname "$0"`"
+PROGNAME="`basename "$0"`"
+APP_BASE_NAME="gradle"
+APP_HOME="`cd "$DIRNAME" >/dev/null; pwd`"
+
+CLASSPATH="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+if [ ! -f "$CLASSPATH" ]; then
+  echo "The Gradle wrapper jar file is missing. Run 'gradle wrapper' on a machine with Gradle to bootstrap the wrapper, or download the distribution manually." >&2
+  exit 1
+fi
+
+# Execute wrapper
+exec java -jar "$CLASSPATH" "$@"
