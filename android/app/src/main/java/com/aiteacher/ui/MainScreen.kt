@@ -147,6 +147,7 @@ fun MainScreen() {
 
 private data class NavItem(val route: String, val icon: ImageVector, val label: String)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ForgeNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
     val items = listOf(
@@ -261,6 +262,7 @@ private fun SettingsRow(emoji: String, label: String, onClick: () -> Unit) {
 
 // ─── AI Provider re-configuration screen ───────────────────────────────────────
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AiProviderSettingsScreen(onClose: () -> Unit) {
     val ctx = LocalContext.current
