@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "0.1",
+  "title": "AI Teacher - Assessment Questions (Draft)",
+  "description": "A minimal question set used to produce a learning assessment. Intended for onboarding-driven flow.",
+  "questions": [
+    {
+      "id": "q_name",
+      "type": "text",
+      "prompt": "What's your name?",
+      "required": true
+    },
+    {
+      "id": "q_level",
+      "type": "single_choice",
+      "prompt": "What is your current programming level?",
+      "options": [
+        { "id": "beginner", "label": "Beginner" },
+        { "id": "intermediate", "label": "Intermediate" },
+        { "id": "advanced", "label": "Advanced" }
+      ],
+      "required": true,
+      "weight": 1
+    },
+    {
+      "id": "q_goals",
+      "type": "multi_choice",
+      "prompt": "Which topics do you want to focus on? (choose all that apply)",
+      "options": [
+        { "id": "vars", "label": "Variables & Expressions" },
+        { "id": "control", "label": "Control Flow" },
+        { "id": "data", "label": "Data Structures" },
+        { "id": "algorithms", "label": "Algorithms" }
+      ],
+      "required": true,
+      "weight": 2
+    },
+    {
+      "id": "q_availability",
+      "type": "availability",
+      "prompt": "When are you usually available for study sessions? Provide weekday keys and time ranges (e.g. mon: 18:00-19:00).",
+      "required": true
+    },
+    {
+      "id": "q_session_length",
+      "type": "single_choice",
+      "prompt": "Preferred session length?",
+      "options": [
+        { "id": "15", "label": "15 minutes" },
+        { "id": "30", "label": "30 minutes" },
+        { "id": "60", "label": "60 minutes" }
+      ],
+      "required": true,
+      "weight": 1
+    },
+    {
+      "id": "q_timezone",
+      "type": "timezone",
+      "prompt": "Your timezone (IANA, e.g. Europe/London). If blank, device timezone will be used.",
+      "required": false
+    }
+  ],
+  "scoring": {
+    "description": "Simple scoring rules used to map answers to an internal Assessment model",
+    "rules": [
+      { "question": "q_level", "map": { "beginner": 0, "intermediate": 1, "advanced": 2 } },
+      { "question": "q_session_length", "map": { "15": 15, "30": 30, "60": 60 } }
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+# Android
+*.iml
+.gradle/
+local.properties
+.idea/
+.DS_Store
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Always commit the Gradle wrapper jar — it is required to build
+!gradle/wrapper/gradle-wrapper.jar
+!android/gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin
+*.class
+*.kt.bak
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db

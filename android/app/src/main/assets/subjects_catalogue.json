@@ -1,0 +1,335 @@
+{
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "mathematics",
+      "label": "Mathematics",
+      "subjects": [
+        {
+          "id": "math",
+          "label": "Mathematics",
+          "category": "Mathematics",
+          "aliases": ["Maths", "Math", "Matematika", "Mathématiques", "Matemáticas", "Matematik", "Matematica", "数学", "数学 (Sùxué)", "数学 (Sūgaku)", "수학", "Рiатематика", "Математика", "Hesabu"]
+        },
+        {
+          "id": "further_mathematics",
+          "label": "Further Mathematics",
+          "category": "Mathematics",
+          "aliases": ["Further Maths", "Additional Mathematics (Advanced)", "Pure Mathematics"]
+        },
+        {
+          "id": "statistics",
+          "label": "Statistics",
+          "category": "Mathematics",
+          "aliases": ["Probability & Statistics", "Data Science (School)", "Statistika", "Statistiques"]
+        },
+        {
+          "id": "applied_mathematics",
+          "label": "Applied Mathematics",
+          "category": "Mathematics",
+          "aliases": ["Applied Maths", "Mechanics"]
+        },
+        {
+          "id": "additional_mathematics",
+          "label": "Additional Mathematics",
+          "category": "Mathematics",
+          "aliases": ["Add Maths", "A-Math", "Matematik Tambahan"]
+        },
+        {
+          "id": "calculus",
+          "label": "Calculus",
+          "category": "Mathematics",
+          "aliases": ["Differential Calculus", "Integral Calculus", "Mathematical Analysis"]
+        }
+      ]
+    },
+    {
+      "id": "sciences",
+      "label": "Sciences",
+      "subjects": [
+        {
+          "id": "physics",
+          "label": "Physics",
+          "category": "Sciences",
+          "aliases": ["Physical Science (Physics component)", "Fisika", "Physique", "Física", "Fizik", "物理", "物理学", "물리학", "Физика"]
+        },
+        {
+          "id": "chemistry",
+          "label": "Chemistry",
+          "category": "Sciences",
+          "aliases": ["Kimia", "Chimie", "Química", "Kemia", "化学", "화학", "Химия"]
+        },
+        {
+          "id": "biology",
+          "label": "Biology",
+          "category": "Sciences",
+          "aliases": ["Life Sciences", "Biologi", "Biologie", "Biología", "Biolojia", "生物", "생물학", "Биология"]
+        },
+        {
+          "id": "combined_science",
+          "label": "Combined Science",
+          "category": "Sciences",
+          "aliases": ["Integrated Science", "General Science", "Triple Science", "Coordinated Science", "Science (Combined)"]
+        },
+        {
+          "id": "environmental_science",
+          "label": "Environmental Science",
+          "category": "Sciences",
+          "aliases": ["Environmental Studies", "Earth and Environmental Science", "Sayansi ya Mazingira"]
+        },
+        {
+          "id": "earth_science",
+          "label": "Earth Science",
+          "category": "Sciences",
+          "aliases": ["Geoscience", "Physical Geography (Science)", "Earth & Space Science"]
+        },
+        {
+          "id": "astronomy",
+          "label": "Astronomy",
+          "category": "Sciences",
+          "aliases": ["Space Science", "Astrophysics (School)", "Astronomia"]
+        },
+        {
+          "id": "agricultural_science",
+          "label": "Agricultural Science",
+          "category": "Sciences",
+          "aliases": ["Agriculture", "Agriscience", "Kilimo", "Science Agricole"]
+        }
+      ]
+    },
+    {
+      "id": "languages_literacy",
+      "label": "Languages & Literacy",
+      "subjects": [
+        {
+          "id": "english_language",
+          "label": "English Language",
+          "category": "Languages & Literacy",
+          "aliases": ["English", "ELA (English Language Arts)", "English as First Language", "English L1"]
+        },
+        {
+          "id": "english_literature",
+          "label": "English Literature",
+          "category": "Languages & Literacy",
+          "aliases": ["Literature in English", "English Lit"]
+        },
+        {
+          "id": "french",
+          "label": "French",
+          "category": "Languages & Literacy",
+          "aliases": ["Français", "French Language", "French as Foreign Language"]
+        },
+        {
+          "id": "spanish",
+          "label": "Spanish",
+          "category": "Languages & Literacy",
+          "aliases": ["Español", "Spanish Language", "Castellano"]
+        },
+        {
+          "id": "german",
+          "label": "German",
+          "category": "Languages & Literacy",
+          "aliases": ["Deutsch", "German Language"]
+        },
+        {
+          "id": "portuguese",
+          "label": "Portuguese",
+          "category": "Languages & Literacy",
+          "aliases": ["Português", "Língua Portuguesa"]
+        },
+        {
+          "id": "arabic",
+          "label": "Arabic",
+          "category": "Languages & Literacy",
+          "aliases": ["اللغة العربية", "Arabic Language", "Modern Standard Arabic"]
+        },
+        {
+          "id": "mandarin_chinese",
+          "label": "Mandarin Chinese",
+          "category": "Languages & Literacy",
+          "aliases": ["Chinese", "普通话", "中文", "Putonghua", "Chinese Language"]
+        },
+        {
+          "id": "japanese",
+          "label": "Japanese",
+          "category": "Languages & Literacy",
+          "aliases": ["日本語", "Nihongo", "Japanese Language"]
+        },
+        {
+          "id": "yoruba",
+          "label": "Yoruba",
+          "category": "Languages & Literacy",
+          "aliases": ["Èdè Yorùbá", "Yoruba Language"]
+        },
+        {
+          "id": "igbo",
+          "label": "Igbo",
+          "category": "Languages & Literacy",
+          "aliases": ["Ásụsụ Igbo", "Igbo Language"]
+        },
+        {
+          "id": "hausa",
+          "label": "Hausa",
+          "category": "Languages & Literacy",
+          "aliases": ["Harshen Hausa", "Hausa Language"]
+        },
+        {
+          "id": "swahili",
+          "label": "Swahili",
+          "category": "Languages & Literacy",
+          "aliases": ["Kiswahili", "KiSwahili Language"]
+        },
+        {
+          "id": "zulu",
+          "label": "Zulu",
+          "category": "Languages & Literacy",
+          "aliases": ["isiZulu", "Zulu Language"]
+        },
+        {
+          "id": "afrikaans",
+          "label": "Afrikaans",
+          "category": "Languages & Literacy",
+          "aliases": ["Afrikaans First Language", "Afrikaans Second Language"]
+        },
+        {
+          "id": "hindi",
+          "label": "Hindi",
+          "category": "Languages & Literacy",
+          "aliases": ["हिन्दी", "Hindi Language"]
+        },
+        {
+          "id": "tamil",
+          "label": "Tamil",
+          "category": "Languages & Literacy",
+          "aliases": ["தமிழ்", "Tamil Language"]
+        },
+        {
+          "id": "urdu",
+          "label": "Urdu",
+          "category": "Languages & Literacy",
+          "aliases": ["اردو", "Urdu Language"]
+        },
+        {
+          "id": "russian",
+          "label": "Russian",
+          "category": "Languages & Literacy",
+          "aliases": ["Русский язык", "Russian Language"]
+        }
+      ]
+    },
+    {
+      "id": "humanities",
+      "label": "Humanities",
+      "subjects": [
+        {
+          "id": "history",
+          "label": "History",
+          "category": "Humanities",
+          "aliases": ["World History", "National History", "Historia", "Histoire", "Storia", "Geschichte", "Tarihi", "Историия"]
+        },
+        {
+          "id": "geography",
+          "label": "Geography",
+          "category": "Humanities",
+          "aliases": ["Physical Geography", "Human Geography", "Géographie", "Geografía", "Geografi", "Jiografia"]
+        },
+        {
+          "id": "social_studies",
+          "label": "Social Studies",
+          "category": "Humanities",
+          "aliases": ["Social Science", "Humanities & Social Sciences (HASS)", "Studies of Society and Environment (SOSE)", "Maarifa ya Jamii"]
+        },
+        {
+          "id": "civic_education",
+          "label": "Civic Education",
+          "category": "Humanities",
+          "aliases": ["Civics", "Citizenship Education", "National Values Education", "Social Studies (Civics component)"]
+        },
+        {
+          "id": "government_politics",
+          "label": "Government / Politics",
+          "category": "Humanities",
+          "aliases": ["Government", "Politics", "Political Science", "Siasa", "Sciences Politiques"]
+        },
+        {
+          "id": "economics",
+          "label": "Economics",
+          "category": "Humanities",
+          "aliases": ["Economics (School)", "Commerce Economics", "Économie", "Economía", "Uchumi"]
+        },
+        {
+          "id": "philosophy",
+          "label": "Philosophy",
+          "category": "Humanities",
+          "aliases": ["Theory of Knowledge (TOK)", "Critical Thinking", "Philosophie", "Filosofía"]
+        },
+        {
+          "id": "psychology",
+          "label": "Psychology",
+          "category": "Humanities",
+          "aliases": ["Behavioural Science", "Psicología", "Psychologie"]
+        },
+        {
+          "id": "sociology",
+          "label": "Sociology",
+          "category": "Humanities",
+          "aliases": ["Social Science (Advanced)", "Sociologie", "Sociología"]
+        }
+      ]
+    },
+    {
+      "id": "technical_vocational",
+      "label": "Technical & Vocational",
+      "subjects": [
+        {
+          "id": "information_technology",
+          "label": "Information Technology",
+          "category": "Technical & Vocational",
+          "aliases": ["IT", "ICT (Information and Communication Technology)", "Teknolojia ya Habari", "Informatique"]
+        },
+        {
+          "id": "computer_science",
+          "label": "Computer Science",
+          "category": "Technical & Vocational",
+          "aliases": ["Computing", "Computer Studies", "CS", "Informatik", "Informatica", "Teknolojia ya Kompyuta"]
+        },
+        {
+          "id": "design_technology",
+          "label": "Design & Technology",
+          "category": "Technical & Vocational",
+          "aliases": ["D&T", "Design and Technology", "Technology (Design)", "Industrial Design"]
+        },
+        {
+          "id": "technical_drawing",
+          "label": "Technical Drawing",
+          "category": "Technical & Vocational",
+          "aliases": ["Engineering Drawing", "Technical Graphics", "Descriptive Drawing"]
+        },
+        {
+          "id": "engineering_science",
+          "label": "Engineering Science",
+          "category": "Technical & Vocational",
+          "aliases": ["Introduction to Engineering", "Engineering Studies", "Technical Science"]
+        },
+        {
+          "id": "home_economics",
+          "label": "Home Economics",
+          "category": "Technical & Vocational",
+          "aliases": ["Family and Consumer Sciences", "Domestic Science", "Home Management"]
+        },
+        {
+          "id": "food_nutrition",
+          "label": "Food & Nutrition",
+          "category": "Technical & Vocational",
+          "aliases": ["Food Technology", "Food Studies", "Nutrition", "Food Science"]
+        },
+        {
+          "id": "health_physical_education",
+          "label": "Health & Physical Education",
+          "category": "Technical & Vocational",
+          "aliases": ["HPE", "Health Education", "Personal, Social, Health and Economic Education (PSHE)"]
+        }
+      ]
+    }
+  ]
+}
