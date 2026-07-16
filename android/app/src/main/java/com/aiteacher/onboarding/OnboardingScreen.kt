@@ -884,7 +884,11 @@ private fun CapabilityTestStep(
                     }
                 }
 
-                TextButton(onClick = onNext,
+                TextButton(onClick = {
+                    // Ensure scoring data exists before advancing.
+                    vm.submitTest()
+                    onNext()
+                },
                     modifier = Modifier.fillMaxWidth()) {
                     Text("Skip test",
                         color = forgeColors.textMuted,
@@ -901,7 +905,10 @@ private fun CapabilityTestStep(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     GhostButton(text = "← Back", onClick = onBack,
                         modifier = Modifier.weight(1f), height = 52.dp)
-                    TextButton(onClick = onNext,
+                    TextButton(onClick = {
+                        vm.submitTest()
+                        onNext()
+                    },
                         modifier = Modifier.weight(1f).height(52.dp)) {
                         Text("Skip", color = forgeColors.textMuted)
                     }
@@ -1121,8 +1128,13 @@ private fun PlanPreviewStep(
     onContinue: (Assessment) -> Unit, ctx: android.content.Context
 ) {
     val scope = rememberCoroutineScope()
-    val plan = remember { vm.generatePreviewPlan() }
+
+    val name by vm.name.collectAsState()
+    val answers by vm.answers.collectAsState()
     val testResult by vm.testResult.collectAsState()
+
+    // Recompute preview whenever inputs affecting scheduling change.
+    val plan = remember(name, answers, testResult) { vm.generatePreviewPlan() }
 
     Column(modifier = Modifier.fillMaxSize()
         .padding(horizontal = 24.dp, vertical = 8.dp),
@@ -1220,12 +1232,26 @@ private fun PlanPreviewStep(
                 scope.launch {
                     if (plan != null) {
                         val repo = PlanRepository(ctx.applicationContext)
-                        val tz = vm.answers.value["q_timezone"] as? String
+
+                        val tzRaw = vm.answers.value["q_timezone"] as? String
                         val sid = repo.saveStudentProfile(
-                            vm.name.value.ifBlank { "Student" }, tz)
+                            vm.name.value.ifBlank { "Student" }, tzRaw
+                        )
                         repo.savePlan(plan, sid)
+
+                        // Thread chosen timezone into notification scheduling when possible.
+                        val parsedZoneId = try {
+                            val tz = tzRaw?.takeIf { it.isNotBlank() }
+                            if (tz != null) java.time.ZoneId.of(tz) else null
+                        } catch (_: Exception) {
+                            null
+                        }
+
                         ScheduleManager.schedulePlanNotifications(
-                            ctx.applicationContext, plan)
+                            ctx.applicationContext,
+                            plan,
+                            zoneId = parsedZoneId
+                        )
                     }
                     onContinue(vm.buildAssessment())
                 }
