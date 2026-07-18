@@ -1,0 +1,69 @@
+{
+  "version": "0.3",
+  "title": "Forge Teach - Student Profile",
+  "description": "Profile questions to personalise the learning plan. Country and grade are collected in a separate step. The AI capability test is generated dynamically after these answers.",
+  "questions": [
+    {
+      "id": "q_name",
+      "type": "text",
+      "prompt": "What is your name?",
+      "required": true
+    },
+    {
+      "id": "q_goals",
+      "type": "multi_choice",
+      "prompt": "Which subjects do you most want help with?",
+      "options": [
+        { "id": "math",    "label": "Mathematics" },
+        { "id": "science", "label": "Science" },
+        { "id": "english", "label": "English / Language Arts" },
+        { "id": "history", "label": "History & Social Studies" },
+        { "id": "ict",     "label": "ICT / Computing" },
+        { "id": "arts",    "label": "Arts & Creative subjects" }
+      ],
+      "required": true
+    },
+    {
+      "id": "q_struggle",
+      "type": "single_choice",
+      "prompt": "When you sit down to study, what is the hardest part?",
+      "options": [
+        { "id": "remembering",    "label": "Remembering things I have learned" },
+        { "id": "word_problems",  "label": "Understanding difficult questions" },
+        { "id": "staying_focused","label": "Staying focused and not getting distracted" },
+        { "id": "time",           "label": "Not having enough time" }
+      ],
+      "required": true
+    },
+    {
+      "id": "q_availability",
+      "type": "day_time_picker",
+      "prompt": "Which days and times are you free to study?",
+      "required": true
+    },
+    {
+      "id": "q_session_length",
+      "type": "single_choice",
+      "prompt": "How long should each study session be?",
+      "options": [
+        { "id": "15", "label": "15 minutes - quick practice" },
+        { "id": "30", "label": "30 minutes - standard session" },
+        { "id": "45", "label": "45 minutes - deep focus" },
+        { "id": "60", "label": "60 minutes - full lesson" }
+      ],
+      "required": true
+    },
+    {
+      "id": "q_timezone",
+      "type": "timezone",
+      "prompt": "Your timezone (leave blank to use your device timezone)",
+      "required": false
+    }
+  ],
+  "scoring": {
+    "description": "Lightweight scoring used before the AI test result is available",
+    "rules": [
+      { "question": "q_session_length", "map": { "15": 1, "30": 2, "45": 3, "60": 4 } }
+    ]
+  }
+}

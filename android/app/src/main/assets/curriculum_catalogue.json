@@ -1,0 +1,368 @@
+{ "version": "2.0", "countries": [
+{ "code": "NG", "name": "Nigeria", "flag": "🇳🇬", "curriculumBody": "NERDC / WAEC / NECO", "systems": [{ "id": "ng_basic", "name": "6-3-3-4 System", "levels": [
+  { "id": "pry1","label": "Primary 1","ageRange": "6–7" }, { "id": "pry2","label": "Primary 2","ageRange": "7–8" },
+  { "id": "pry3","label": "Primary 3","ageRange": "8–9" }, { "id": "pry4","label": "Primary 4","ageRange": "9–10" },
+  { "id": "pry5","label": "Primary 5","ageRange": "10–11" }, { "id": "pry6","label": "Primary 6","ageRange": "11–12" },
+  { "id": "jss1","label": "JSS 1","ageRange": "12–13" }, { "id": "jss2","label": "JSS 2","ageRange": "13–14" },
+  { "id": "jss3","label": "JSS 3 (BECE)","ageRange": "14–15" },
+  { "id": "ss1","label": "SS 1","ageRange": "15–16" }, { "id": "ss2","label": "SS 2","ageRange": "16–17" },
+  { "id": "ss3","label": "SS 3 (WAEC / NECO)","ageRange": "17–18" }
+], "keyExams": ["Common Entrance","BECE","WAEC","NECO","JAMB"] }] },
+{ "code": "GH", "name": "Ghana", "flag": "🇬🇭", "curriculumBody": "GES / WAEC", "systems": [{ "id": "gh_basic", "name": "Pre-tertiary Education", "levels": [
+  { "id": "b1","label": "Basic 1","ageRange": "6–7" }, { "id": "b2","label": "Basic 2","ageRange": "7–8" },
+  { "id": "b3","label": "Basic 3","ageRange": "8–9" }, { "id": "b4","label": "Basic 4","ageRange": "9–10" },
+  { "id": "b5","label": "Basic 5","ageRange": "10–11" }, { "id": "b6","label": "Basic 6","ageRange": "11–12" },
+  { "id": "jhs1","label": "JHS 1","ageRange": "12–13" }, { "id": "jhs2","label": "JHS 2","ageRange": "13–14" },
+  { "id": "jhs3","label": "JHS 3 (BECE)","ageRange": "14–15" },
+  { "id": "shs1","label": "SHS 1","ageRange": "15–16" }, { "id": "shs2","label": "SHS 2","ageRange": "16–17" },
+  { "id": "shs3","label": "SHS 3 (WASSCE)","ageRange": "17–18" }
+], "keyExams": ["BECE","WASSCE"] }] },
+{ "code": "ZA", "name": "South Africa", "flag": "🇿🇦", "curriculumBody": "DBE / CAPS", "systems": [{ "id": "za_caps", "name": "CAPS", "levels": [
+  { "id": "gr1","label": "Grade 1","ageRange": "6–7" }, { "id": "gr2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "gr3","label": "Grade 3","ageRange": "8–9" }, { "id": "gr4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "gr5","label": "Grade 5","ageRange": "10–11" }, { "id": "gr6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "gr7","label": "Grade 7","ageRange": "12–13" }, { "id": "gr8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "gr9","label": "Grade 9","ageRange": "14–15" }, { "id": "gr10","label": "Grade 10","ageRange": "15–16" },
+  { "id": "gr11","label": "Grade 11","ageRange": "16–17" }, { "id": "gr12","label": "Grade 12 (Matric)","ageRange": "17–18" }
+], "keyExams": ["ANA","NSC (Matric)"] }] },
+{ "code": "KE", "name": "Kenya", "flag": "🇰🇪", "curriculumBody": "KICD / KNEC", "systems": [{ "id": "ke_cbc", "name": "Competency Based Curriculum (CBC)", "levels": [
+  { "id": "pp1","label": "PP1","ageRange": "4–5" }, { "id": "pp2","label": "PP2","ageRange": "5–6" },
+  { "id": "g1","label": "Grade 1","ageRange": "6–7" }, { "id": "g2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "g3","label": "Grade 3","ageRange": "8–9" }, { "id": "g4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "g5","label": "Grade 5","ageRange": "10–11" }, { "id": "g6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "g7","label": "Grade 7","ageRange": "12–13" }, { "id": "g8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "g9","label": "Grade 9 (KCPE)","ageRange": "14–15" }, { "id": "g10","label": "Grade 10","ageRange": "15–16" },
+  { "id": "g11","label": "Grade 11","ageRange": "16–17" }, { "id": "g12","label": "Grade 12 (KCSE)","ageRange": "17–18" }
+], "keyExams": ["KCPE","KCSE"] }] },
+{ "code": "ET", "name": "Ethiopia", "flag": "🇪🇹", "curriculumBody": "MoE Ethiopia", "systems": [{ "id": "et_general", "name": "General Education", "levels": [
+  { "id": "g1","label": "Grade 1","ageRange": "7–8" }, { "id": "g2","label": "Grade 2","ageRange": "8–9" },
+  { "id": "g3","label": "Grade 3","ageRange": "9–10" }, { "id": "g4","label": "Grade 4","ageRange": "10–11" },
+  { "id": "g5","label": "Grade 5","ageRange": "11–12" }, { "id": "g6","label": "Grade 6","ageRange": "12–13" },
+  { "id": "g7","label": "Grade 7","ageRange": "13–14" }, { "id": "g8","label": "Grade 8","ageRange": "14–15" },
+  { "id": "g9","label": "Grade 9","ageRange": "15–16" }, { "id": "g10","label": "Grade 10 (ESLCE)","ageRange": "16–17" },
+  { "id": "g11","label": "Grade 11","ageRange": "17–18" }, { "id": "g12","label": "Grade 12 (EHEECE)","ageRange": "18–19" }
+], "keyExams": ["Grade 8 National Exam","ESLCE","EHEECE"] }] },
+{ "code": "EG", "name": "Egypt", "flag": "🇪🇬", "curriculumBody": "MoE Egypt", "systems": [{ "id": "eg_general", "name": "General Education", "levels": [
+  { "id": "g1","label": "Year 1 (Primary)","ageRange": "6–7" }, { "id": "g2","label": "Year 2","ageRange": "7–8" },
+  { "id": "g3","label": "Year 3","ageRange": "8–9" }, { "id": "g4","label": "Year 4","ageRange": "9–10" },
+  { "id": "g5","label": "Year 5","ageRange": "10–11" }, { "id": "g6","label": "Year 6 (Preparatory)","ageRange": "11–12" },
+  { "id": "g7","label": "Year 7","ageRange": "12–13" }, { "id": "g8","label": "Year 8","ageRange": "13–14" },
+  { "id": "g9","label": "Year 9","ageRange": "14–15" }, { "id": "g10","label": "Year 10 (Secondary)","ageRange": "15–16" },
+  { "id": "g11","label": "Year 11","ageRange": "16–17" }, { "id": "g12","label": "Year 12 (Thanaweyya Amma)","ageRange": "17–18" }
+], "keyExams": ["Primary Certificate","Preparatory Certificate","Thanaweyya Amma"] }] },
+{ "code": "TZ", "name": "Tanzania", "flag": "🇹🇿", "curriculumBody": "NECTA", "systems": [{ "id": "tz_general", "name": "General Education", "levels": [
+  { "id": "std1","label": "Standard 1","ageRange": "7–8" }, { "id": "std2","label": "Standard 2","ageRange": "8–9" },
+  { "id": "std3","label": "Standard 3","ageRange": "9–10" }, { "id": "std4","label": "Standard 4","ageRange": "10–11" },
+  { "id": "std5","label": "Standard 5","ageRange": "11–12" }, { "id": "std6","label": "Standard 6","ageRange": "12–13" },
+  { "id": "std7","label": "Standard 7 (PSLE)","ageRange": "13–14" },
+  { "id": "f1","label": "Form 1","ageRange": "14–15" }, { "id": "f2","label": "Form 2","ageRange": "15–16" },
+  { "id": "f3","label": "Form 3","ageRange": "16–17" }, { "id": "f4","label": "Form 4 (CSEE)","ageRange": "17–18" },
+  { "id": "f5","label": "Form 5","ageRange": "18–19" }, { "id": "f6","label": "Form 6 (ACSEE)","ageRange": "19–20" }
+], "keyExams": ["PSLE","CSEE","ACSEE"] }] },
+{ "code": "UG", "name": "Uganda", "flag": "🇺🇬", "curriculumBody": "UNEB", "systems": [{ "id": "ug_general", "name": "General Education", "levels": [
+  { "id": "p1","label": "Primary 1","ageRange": "6–7" }, { "id": "p2","label": "Primary 2","ageRange": "7–8" },
+  { "id": "p3","label": "Primary 3","ageRange": "8–9" }, { "id": "p4","label": "Primary 4","ageRange": "9–10" },
+  { "id": "p5","label": "Primary 5","ageRange": "10–11" }, { "id": "p6","label": "Primary 6","ageRange": "11–12" },
+  { "id": "p7","label": "Primary 7 (PLE)","ageRange": "12–13" },
+  { "id": "s1","label": "Senior 1","ageRange": "13–14" }, { "id": "s2","label": "Senior 2","ageRange": "14–15" },
+  { "id": "s3","label": "Senior 3","ageRange": "15–16" }, { "id": "s4","label": "Senior 4 (UCE)","ageRange": "16–17" },
+  { "id": "s5","label": "Senior 5","ageRange": "17–18" }, { "id": "s6","label": "Senior 6 (UACE)","ageRange": "18–19" }
+], "keyExams": ["PLE","UCE","UACE"] }] },
+{ "code": "RW", "name": "Rwanda", "flag": "🇷🇼", "curriculumBody": "REB / WDA", "systems": [{ "id": "rw_general", "name": "General Education (CBC)", "levels": [
+  { "id": "p1","label": "Primary 1","ageRange": "7–8" }, { "id": "p2","label": "Primary 2","ageRange": "8–9" },
+  { "id": "p3","label": "Primary 3","ageRange": "9–10" }, { "id": "p4","label": "Primary 4","ageRange": "10–11" },
+  { "id": "p5","label": "Primary 5","ageRange": "11–12" }, { "id": "p6","label": "Primary 6 (NLE)","ageRange": "12–13" },
+  { "id": "s1","label": "Senior 1","ageRange": "13–14" }, { "id": "s2","label": "Senior 2","ageRange": "14–15" },
+  { "id": "s3","label": "Senior 3 (O-Level Exam)","ageRange": "15–16" },
+  { "id": "s4","label": "Senior 4","ageRange": "16–17" }, { "id": "s5","label": "Senior 5","ageRange": "17–18" },
+  { "id": "s6","label": "Senior 6 (A-Level Exam)","ageRange": "18–19" }
+], "keyExams": ["NLE","O-Level","A-Level"] }] },
+{ "code": "SN", "name": "Senegal", "flag": "🇸🇳", "curriculumBody": "MEN Sénégal", "systems": [{ "id": "sn_general", "name": "Enseignement Général", "levels": [
+  { "id": "ci","label": "CI (1ère année)","ageRange": "6–7" }, { "id": "cp","label": "CP (2ème)","ageRange": "7–8" },
+  { "id": "ce1","label": "CE1","ageRange": "8–9" }, { "id": "ce2","label": "CE2","ageRange": "9–10" },
+  { "id": "cm1","label": "CM1","ageRange": "10–11" }, { "id": "cm2","label": "CM2 (CFEE)","ageRange": "11–12" },
+  { "id": "6e","label": "6ème","ageRange": "12–13" }, { "id": "5e","label": "5ème","ageRange": "13–14" },
+  { "id": "4e","label": "4ème","ageRange": "14–15" }, { "id": "3e","label": "3ème (BFEM)","ageRange": "15–16" },
+  { "id": "2nd","label": "2nde","ageRange": "16–17" }, { "id": "1re","label": "1ère","ageRange": "17–18" },
+  { "id": "tle","label": "Terminale (Baccalauréat)","ageRange": "18–19" }
+], "keyExams": ["CFEE","BFEM","Baccalauréat"] }] },
+{ "code": "MA", "name": "Morocco", "flag": "🇲🇦", "curriculumBody": "MEN Maroc", "systems": [{ "id": "ma_general", "name": "Enseignement Scolaire", "levels": [
+  { "id": "a1","label": "1ère année primaire","ageRange": "6–7" }, { "id": "a2","label": "2ème année","ageRange": "7–8" },
+  { "id": "a3","label": "3ème année","ageRange": "8–9" }, { "id": "a4","label": "4ème année","ageRange": "9–10" },
+  { "id": "a5","label": "5ème année","ageRange": "10–11" }, { "id": "a6","label": "6ème année (CEP)","ageRange": "11–12" },
+  { "id": "tc","label": "Tronc Commun","ageRange": "12–13" }, { "id": "1c","label": "1ère Collège","ageRange": "13–14" },
+  { "id": "2c","label": "2ème Collège (Brevet)","ageRange": "14–15" },
+  { "id": "1l","label": "1ère Lycée","ageRange": "15–16" }, { "id": "2l","label": "2ème Lycée","ageRange": "16–17" },
+  { "id": "tle","label": "Terminale (Baccalauréat)","ageRange": "17–18" }
+], "keyExams": ["CEP","Brevet","Baccalauréat"] }] },
+{ "code": "US", "name": "United States", "flag": "🇺🇸", "curriculumBody": "State Boards / Common Core", "systems": [{ "id": "us_k12", "name": "K-12", "levels": [
+  { "id": "kg","label": "Kindergarten","ageRange": "5–6" },
+  { "id": "g1","label": "Grade 1","ageRange": "6–7" }, { "id": "g2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "g3","label": "Grade 3","ageRange": "8–9" }, { "id": "g4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "g5","label": "Grade 5","ageRange": "10–11" }, { "id": "g6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "g7","label": "Grade 7","ageRange": "12–13" }, { "id": "g8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "g9","label": "Grade 9 (Freshman)","ageRange": "14–15" }, { "id": "g10","label": "Grade 10 (Sophomore)","ageRange": "15–16" },
+  { "id": "g11","label": "Grade 11 (Junior)","ageRange": "16–17" }, { "id": "g12","label": "Grade 12 (Senior)","ageRange": "17–18" }
+], "keyExams": ["State Tests","SAT","ACT","AP Exams","IB"] }] },
+{ "code": "CA", "name": "Canada", "flag": "🇨🇦", "curriculumBody": "Provincial Ministries", "systems": [{ "id": "ca_k12", "name": "K–12 (Provincial)", "levels": [
+  { "id": "kg","label": "Kindergarten","ageRange": "5–6" },
+  { "id": "g1","label": "Grade 1","ageRange": "6–7" }, { "id": "g2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "g3","label": "Grade 3","ageRange": "8–9" }, { "id": "g4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "g5","label": "Grade 5","ageRange": "10–11" }, { "id": "g6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "g7","label": "Grade 7","ageRange": "12–13" }, { "id": "g8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "g9","label": "Grade 9","ageRange": "14–15" }, { "id": "g10","label": "Grade 10","ageRange": "15–16" },
+  { "id": "g11","label": "Grade 11","ageRange": "16–17" }, { "id": "g12","label": "Grade 12","ageRange": "17–18" }
+], "keyExams": ["Provincial Standardized Tests","OSSLT","AP Exams"] }] },
+{ "code": "BR", "name": "Brazil", "flag": "🇧🇷", "curriculumBody": "MEC / BNCC", "systems": [{ "id": "br_basic", "name": "Educação Básica", "levels": [
+  { "id": "a1","label": "1º Ano (Fundamental)","ageRange": "6–7" }, { "id": "a2","label": "2º Ano","ageRange": "7–8" },
+  { "id": "a3","label": "3º Ano","ageRange": "8–9" }, { "id": "a4","label": "4º Ano","ageRange": "9–10" },
+  { "id": "a5","label": "5º Ano","ageRange": "10–11" }, { "id": "a6","label": "6º Ano","ageRange": "11–12" },
+  { "id": "a7","label": "7º Ano","ageRange": "12–13" }, { "id": "a8","label": "8º Ano","ageRange": "13–14" },
+  { "id": "a9","label": "9º Ano","ageRange": "14–15" },
+  { "id": "em1","label": "1ª Série (Ensino Médio)","ageRange": "15–16" },
+  { "id": "em2","label": "2ª Série","ageRange": "16–17" }, { "id": "em3","label": "3ª Série (ENEM)","ageRange": "17–18" }
+], "keyExams": ["Prova Brasil","ENEM","FUVEST"] }] },
+{ "code": "MX", "name": "Mexico", "flag": "🇲🇽", "curriculumBody": "SEP", "systems": [{ "id": "mx_basica", "name": "Educación Básica y Media", "levels": [
+  { "id": "p1","label": "1° Primaria","ageRange": "6–7" }, { "id": "p2","label": "2° Primaria","ageRange": "7–8" },
+  { "id": "p3","label": "3° Primaria","ageRange": "8–9" }, { "id": "p4","label": "4° Primaria","ageRange": "9–10" },
+  { "id": "p5","label": "5° Primaria","ageRange": "10–11" }, { "id": "p6","label": "6° Primaria","ageRange": "11–12" },
+  { "id": "s1","label": "1° Secundaria","ageRange": "12–13" }, { "id": "s2","label": "2° Secundaria","ageRange": "13–14" },
+  { "id": "s3","label": "3° Secundaria","ageRange": "14–15" },
+  { "id": "b1","label": "1° Bachillerato","ageRange": "15–16" }, { "id": "b2","label": "2° Bachillerato","ageRange": "16–17" },
+  { "id": "b3","label": "3° Bachillerato (EXANI)","ageRange": "17–18" }
+], "keyExams": ["PLANEA","ENLACE","EXANI"] }] },
+{ "code": "AR", "name": "Argentina", "flag": "🇦🇷", "curriculumBody": "ME Argentina", "systems": [{ "id": "ar_general", "name": "Sistema Educativo Nacional", "levels": [
+  { "id": "p1","label": "1° Grado (Primaria)","ageRange": "6–7" }, { "id": "p2","label": "2° Grado","ageRange": "7–8" },
+  { "id": "p3","label": "3° Grado","ageRange": "8–9" }, { "id": "p4","label": "4° Grado","ageRange": "9–10" },
+  { "id": "p5","label": "5° Grado","ageRange": "10–11" }, { "id": "p6","label": "6° Grado","ageRange": "11–12" },
+  { "id": "p7","label": "7° Grado","ageRange": "12–13" },
+  { "id": "s1","label": "1° Año (Secundaria)","ageRange": "13–14" }, { "id": "s2","label": "2° Año","ageRange": "14–15" },
+  { "id": "s3","label": "3° Año","ageRange": "15–16" }, { "id": "s4","label": "4° Año","ageRange": "16–17" },
+  { "id": "s5","label": "5° Año (PAES)","ageRange": "17–18" }
+], "keyExams": ["ONE","PAES"] }] },
+{ "code": "CO", "name": "Colombia", "flag": "🇨🇴", "curriculumBody": "MEN Colombia", "systems": [{ "id": "co_general", "name": "Sistema Educativo Colombiano", "levels": [
+  { "id": "p1","label": "Grado 1°","ageRange": "6–7" }, { "id": "p2","label": "Grado 2°","ageRange": "7–8" },
+  { "id": "p3","label": "Grado 3°","ageRange": "8–9" }, { "id": "p4","label": "Grado 4°","ageRange": "9–10" },
+  { "id": "p5","label": "Grado 5°","ageRange": "10–11" }, { "id": "p6","label": "Grado 6°","ageRange": "11–12" },
+  { "id": "p7","label": "Grado 7°","ageRange": "12–13" }, { "id": "p8","label": "Grado 8°","ageRange": "13–14" },
+  { "id": "p9","label": "Grado 9°","ageRange": "14–15" }, { "id": "p10","label": "Grado 10°","ageRange": "15–16" },
+  { "id": "p11","label": "Grado 11° (ICFES)","ageRange": "16–17" }
+], "keyExams": ["Pruebas Saber","ICFES"] }] },
+{ "code": "GB", "name": "United Kingdom", "flag": "🇬🇧", "curriculumBody": "DfE / Ofqual", "systems": [{ "id": "gb_national", "name": "National Curriculum (England)", "levels": [
+  { "id": "yr1","label": "Year 1","ageRange": "5–6" }, { "id": "yr2","label": "Year 2","ageRange": "6–7" },
+  { "id": "yr3","label": "Year 3","ageRange": "7–8" }, { "id": "yr4","label": "Year 4","ageRange": "8–9" },
+  { "id": "yr5","label": "Year 5","ageRange": "9–10" }, { "id": "yr6","label": "Year 6 (SATs)","ageRange": "10–11" },
+  { "id": "yr7","label": "Year 7","ageRange": "11–12" }, { "id": "yr8","label": "Year 8","ageRange": "12–13" },
+  { "id": "yr9","label": "Year 9","ageRange": "13–14" },
+  { "id": "yr10","label": "Year 10 (GCSE start)","ageRange": "14–15" }, { "id": "yr11","label": "Year 11 (GCSEs)","ageRange": "15–16" },
+  { "id": "yr12","label": "Year 12 / Lower Sixth","ageRange": "16–17" }, { "id": "yr13","label": "Year 13 / Upper Sixth (A-Levels)","ageRange": "17–18" }
+], "keyExams": ["KS2 SATs","GCSEs","A-Levels"] }] },
+{ "code": "FR", "name": "France", "flag": "🇫🇷", "curriculumBody": "Éducation Nationale (MEN)", "systems": [{ "id": "fr_national", "name": "Système Éducatif Français", "levels": [
+  { "id": "cp","label": "CP (Cours Préparatoire)","ageRange": "6–7" }, { "id": "ce1","label": "CE1","ageRange": "7–8" },
+  { "id": "ce2","label": "CE2","ageRange": "8–9" }, { "id": "cm1","label": "CM1","ageRange": "9–10" },
+  { "id": "cm2","label": "CM2","ageRange": "10–11" },
+  { "id": "6e","label": "6ème (Collège)","ageRange": "11–12" }, { "id": "5e","label": "5ème","ageRange": "12–13" },
+  { "id": "4e","label": "4ème","ageRange": "13–14" }, { "id": "3e","label": "3ème (Brevet)","ageRange": "14–15" },
+  { "id": "2nd","label": "2nde (Lycée)","ageRange": "15–16" }, { "id": "1re","label": "1ère","ageRange": "16–17" },
+  { "id": "tle","label": "Terminale (Baccalauréat)","ageRange": "17–18" }
+], "keyExams": ["DNB (Brevet)","Baccalauréat"] }] },
+{ "code": "DE", "name": "Germany", "flag": "🇩🇪", "curriculumBody": "KMK (State Ministries)", "systems": [{ "id": "de_general", "name": "Allgemeinbildendes Schulsystem", "levels": [
+  { "id": "kl1","label": "Klasse 1","ageRange": "6–7" }, { "id": "kl2","label": "Klasse 2","ageRange": "7–8" },
+  { "id": "kl3","label": "Klasse 3","ageRange": "8–9" }, { "id": "kl4","label": "Klasse 4","ageRange": "9–10" },
+  { "id": "kl5","label": "Klasse 5","ageRange": "10–11" }, { "id": "kl6","label": "Klasse 6","ageRange": "11–12" },
+  { "id": "kl7","label": "Klasse 7","ageRange": "12–13" }, { "id": "kl8","label": "Klasse 8","ageRange": "13–14" },
+  { "id": "kl9","label": "Klasse 9","ageRange": "14–15" }, { "id": "kl10","label": "Klasse 10","ageRange": "15–16" },
+  { "id": "kl11","label": "Klasse 11 (Oberstufe)","ageRange": "16–17" },
+  { "id": "kl12","label": "Klasse 12 (Abitur)","ageRange": "17–18" }
+], "keyExams": ["Mittlere Reife","Abitur"] }] },
+{ "code": "ES", "name": "Spain", "flag": "🇪🇸", "curriculumBody": "MEFP España", "systems": [{ "id": "es_general", "name": "Sistema Educativo Español", "levels": [
+  { "id": "ep1","label": "1° Primaria","ageRange": "6–7" }, { "id": "ep2","label": "2° Primaria","ageRange": "7–8" },
+  { "id": "ep3","label": "3° Primaria","ageRange": "8–9" }, { "id": "ep4","label": "4° Primaria","ageRange": "9–10" },
+  { "id": "ep5","label": "5° Primaria","ageRange": "10–11" }, { "id": "ep6","label": "6° Primaria","ageRange": "11–12" },
+  { "id": "eso1","label": "1° ESO","ageRange": "12–13" }, { "id": "eso2","label": "2° ESO","ageRange": "13–14" },
+  { "id": "eso3","label": "3° ESO","ageRange": "14–15" }, { "id": "eso4","label": "4° ESO (Título)","ageRange": "15–16" },
+  { "id": "bach1","label": "1° Bachillerato","ageRange": "16–17" }, { "id": "bach2","label": "2° Bachillerato (EBAU)","ageRange": "17–18" }
+], "keyExams": ["ESO Certificate","EBAU (Selectividad)"] }] },
+{ "code": "IT", "name": "Italy", "flag": "🇮🇹", "curriculumBody": "MIUR", "systems": [{ "id": "it_general", "name": "Sistema Scolastico Italiano", "levels": [
+  { "id": "c1","label": "Classe 1ª (Primaria)","ageRange": "6–7" }, { "id": "c2","label": "Classe 2ª","ageRange": "7–8" },
+  { "id": "c3","label": "Classe 3ª","ageRange": "8–9" }, { "id": "c4","label": "Classe 4ª","ageRange": "9–10" },
+  { "id": "c5","label": "Classe 5ª","ageRange": "10–11" },
+  { "id": "m1","label": "Classe 1ª (Media)","ageRange": "11–12" }, { "id": "m2","label": "Classe 2ª","ageRange": "12–13" },
+  { "id": "m3","label": "Classe 3ª (Esame di Stato)","ageRange": "13–14" },
+  { "id": "l1","label": "1° Liceo / Superiore","ageRange": "14–15" }, { "id": "l2","label": "2°","ageRange": "15–16" },
+  { "id": "l3","label": "3°","ageRange": "16–17" }, { "id": "l4","label": "4°","ageRange": "17–18" },
+  { "id": "l5","label": "5° (Maturità)","ageRange": "18–19" }
+], "keyExams": ["Esame di Stato Terza Media","Maturità"] }] },
+{ "code": "PL", "name": "Poland", "flag": "🇵🇱", "curriculumBody": "MEN Polska", "systems": [{ "id": "pl_general", "name": "System Oświaty", "levels": [
+  { "id": "kl1","label": "Klasa 1 (Podstawowa)","ageRange": "7–8" }, { "id": "kl2","label": "Klasa 2","ageRange": "8–9" },
+  { "id": "kl3","label": "Klasa 3","ageRange": "9–10" }, { "id": "kl4","label": "Klasa 4","ageRange": "10–11" },
+  { "id": "kl5","label": "Klasa 5","ageRange": "11–12" }, { "id": "kl6","label": "Klasa 6","ageRange": "12–13" },
+  { "id": "kl7","label": "Klasa 7","ageRange": "13–14" }, { "id": "kl8","label": "Klasa 8 (Egzamin Ósmoklasisty)","ageRange": "14–15" },
+  { "id": "lo1","label": "Klasa 1 (Liceum)","ageRange": "15–16" }, { "id": "lo2","label": "Klasa 2","ageRange": "16–17" },
+  { "id": "lo3","label": "Klasa 3","ageRange": "17–18" }, { "id": "lo4","label": "Klasa 4 (Matura)","ageRange": "18–19" }
+], "keyExams": ["Egzamin Ósmoklasisty","Matura"] }] },
+{ "code": "NL", "name": "Netherlands", "flag": "🇳🇱", "curriculumBody": "OCW Nederland", "systems": [{ "id": "nl_general", "name": "Nederlands Onderwijs", "levels": [
+  { "id": "gr1","label": "Groep 1","ageRange": "4–5" }, { "id": "gr2","label": "Groep 2","ageRange": "5–6" },
+  { "id": "gr3","label": "Groep 3","ageRange": "6–7" }, { "id": "gr4","label": "Groep 4","ageRange": "7–8" },
+  { "id": "gr5","label": "Groep 5","ageRange": "8–9" }, { "id": "gr6","label": "Groep 6","ageRange": "9–10" },
+  { "id": "gr7","label": "Groep 7","ageRange": "10–11" }, { "id": "gr8","label": "Groep 8 (Eindtoets)","ageRange": "11–12" },
+  { "id": "kl1","label": "Klas 1 (VO)","ageRange": "12–13" }, { "id": "kl2","label": "Klas 2","ageRange": "13–14" },
+  { "id": "kl3","label": "Klas 3","ageRange": "14–15" }, { "id": "kl4","label": "Klas 4","ageRange": "15–16" },
+  { "id": "kl5","label": "Klas 5","ageRange": "16–17" }, { "id": "kl6","label": "Klas 6 (Eindexamen)","ageRange": "17–18" }
+], "keyExams": ["Eindtoets PO","VMBO / HAVO / VWO Eindexamen"] }] },
+{ "code": "PT", "name": "Portugal", "flag": "🇵🇹", "curriculumBody": "ME Portugal", "systems": [{ "id": "pt_general", "name": "Sistema Educativo Português", "levels": [
+  { "id": "a1","label": "1.º Ano","ageRange": "6–7" }, { "id": "a2","label": "2.º Ano","ageRange": "7–8" },
+  { "id": "a3","label": "3.º Ano","ageRange": "8–9" }, { "id": "a4","label": "4.º Ano","ageRange": "9–10" },
+  { "id": "a5","label": "5.º Ano","ageRange": "10–11" }, { "id": "a6","label": "6.º Ano","ageRange": "11–12" },
+  { "id": "a7","label": "7.º Ano","ageRange": "12–13" }, { "id": "a8","label": "8.º Ano","ageRange": "13–14" },
+  { "id": "a9","label": "9.º Ano","ageRange": "14–15" }, { "id": "a10","label": "10.º Ano","ageRange": "15–16" },
+  { "id": "a11","label": "11.º Ano","ageRange": "16–17" }, { "id": "a12","label": "12.º Ano (Exames Nacionais)","ageRange": "17–18" }
+], "keyExams": ["Provas de Aferição","Exames Nacionais","IAVE"] }] },
+{ "code": "RU", "name": "Russia", "flag": "🇷🇺", "curriculumBody": "Минпросвещения России", "systems": [{ "id": "ru_general", "name": "Общее образование", "levels": [
+  { "id": "kl1","label": "1 класс","ageRange": "7–8" }, { "id": "kl2","label": "2 класс","ageRange": "8–9" },
+  { "id": "kl3","label": "3 класс","ageRange": "9–10" }, { "id": "kl4","label": "4 класс","ageRange": "10–11" },
+  { "id": "kl5","label": "5 класс","ageRange": "11–12" }, { "id": "kl6","label": "6 класс","ageRange": "12–13" },
+  { "id": "kl7","label": "7 класс","ageRange": "13–14" }, { "id": "kl8","label": "8 класс","ageRange": "14–15" },
+  { "id": "kl9","label": "9 класс (ОГЭ)","ageRange": "15–16" }, { "id": "kl10","label": "10 класс","ageRange": "16–17" },
+  { "id": "kl11","label": "11 класс (ЕГЭ)","ageRange": "17–18" }
+], "keyExams": ["ОГЭ","ЕГЭ"] }] },
+{ "code": "IN", "name": "India", "flag": "🇮🇳", "curriculumBody": "CBSE / ICSE / State Boards", "systems": [
+  { "id": "in_cbse", "name": "CBSE", "levels": [
+    { "id": "c1","label": "Class 1","ageRange": "6–7" }, { "id": "c2","label": "Class 2","ageRange": "7–8" },
+    { "id": "c3","label": "Class 3","ageRange": "8–9" }, { "id": "c4","label": "Class 4","ageRange": "9–10" },
+    { "id": "c5","label": "Class 5","ageRange": "10–11" }, { "id": "c6","label": "Class 6","ageRange": "11–12" },
+    { "id": "c7","label": "Class 7","ageRange": "12–13" }, { "id": "c8","label": "Class 8","ageRange": "13–14" },
+    { "id": "c9","label": "Class 9","ageRange": "14–15" }, { "id": "c10","label": "Class 10 (Board)","ageRange": "15–16" },
+    { "id": "c11","label": "Class 11","ageRange": "16–17" }, { "id": "c12","label": "Class 12 (Board)","ageRange": "17–18" }
+  ], "keyExams": ["CBSE Board (10)","CBSE Board (12)","JEE","NEET"] },
+  { "id": "in_icse", "name": "ICSE / ISC", "levels": [
+    { "id": "c1","label": "Class 1","ageRange": "6–7" }, { "id": "c2","label": "Class 2","ageRange": "7–8" },
+    { "id": "c3","label": "Class 3","ageRange": "8–9" }, { "id": "c4","label": "Class 4","ageRange": "9–10" },
+    { "id": "c5","label": "Class 5","ageRange": "10–11" }, { "id": "c6","label": "Class 6","ageRange": "11–12" },
+    { "id": "c7","label": "Class 7","ageRange": "12–13" }, { "id": "c8","label": "Class 8","ageRange": "13–14" },
+    { "id": "c9","label": "Class 9","ageRange": "14–15" }, { "id": "c10","label": "Class 10 (ICSE)","ageRange": "15–16" },
+    { "id": "c11","label": "Class 11","ageRange": "16–17" }, { "id": "c12","label": "Class 12 (ISC)","ageRange": "17–18" }
+  ], "keyExams": ["ICSE","ISC","JEE","NEET"] }
+] },
+{ "code": "CN", "name": "China", "flag": "🇨🇳", "curriculumBody": "MoE China (教育部)", "systems": [{ "id": "cn_general", "name": "普通基础教育", "levels": [
+  { "id": "g1","label": "一年级 (Grade 1)","ageRange": "6–7" }, { "id": "g2","label": "二年级","ageRange": "7–8" },
+  { "id": "g3","label": "三年级","ageRange": "8–9" }, { "id": "g4","label": "四年级","ageRange": "9–10" },
+  { "id": "g5","label": "五年级","ageRange": "10–11" }, { "id": "g6","label": "六年级","ageRange": "11–12" },
+  { "id": "g7","label": "初一 (Grade 7)","ageRange": "12–13" }, { "id": "g8","label": "初二","ageRange": "13–14" },
+  { "id": "g9","label": "初三 (中考)","ageRange": "14–15" },
+  { "id": "g10","label": "高一 (Grade 10)","ageRange": "15–16" }, { "id": "g11","label": "高二","ageRange": "16–17" },
+  { "id": "g12","label": "高三 (高考 Gaokao)","ageRange": "17–18" }
+], "keyExams": ["中考 (Zhongkao)","高考 (Gaokao)"] }] },
+{ "code": "JP", "name": "Japan", "flag": "🇯🇵", "curriculumBody": "MEXT (文部科学省)", "systems": [{ "id": "jp_general", "name": "学校教育", "levels": [
+  { "id": "e1","label": "小学1年 (Grade 1)","ageRange": "6–7" }, { "id": "e2","label": "小学2年","ageRange": "7–8" },
+  { "id": "e3","label": "小学3年","ageRange": "8–9" }, { "id": "e4","label": "小学4年","ageRange": "9–10" },
+  { "id": "e5","label": "小学5年","ageRange": "10–11" }, { "id": "e6","label": "小学6年","ageRange": "11–12" },
+  { "id": "j1","label": "中学1年","ageRange": "12–13" }, { "id": "j2","label": "中学2年","ageRange": "13–14" },
+  { "id": "j3","label": "中学3年 (高校受験)","ageRange": "14–15" },
+  { "id": "h1","label": "高校1年","ageRange": "15–16" }, { "id": "h2","label": "高校2年","ageRange": "16–17" },
+  { "id": "h3","label": "高校3年 (共通テスト)","ageRange": "17–18" }
+], "keyExams": ["中学校卒業試験","大学入学共通テスト (CSAT)"] }] },
+{ "code": "KR", "name": "South Korea", "flag": "🇰🇷", "curriculumBody": "교육부 (MOE Korea)", "systems": [{ "id": "kr_general", "name": "초중고 교육과정", "levels": [
+  { "id": "g1","label": "초등 1학년","ageRange": "7–8" }, { "id": "g2","label": "2학년","ageRange": "8–9" },
+  { "id": "g3","label": "3학년","ageRange": "9–10" }, { "id": "g4","label": "4학년","ageRange": "10–11" },
+  { "id": "g5","label": "5학년","ageRange": "11–12" }, { "id": "g6","label": "6학년","ageRange": "12–13" },
+  { "id": "m1","label": "중학교 1학년","ageRange": "13–14" }, { "id": "m2","label": "2학년","ageRange": "14–15" },
+  { "id": "m3","label": "3학년","ageRange": "15–16" },
+  { "id": "h1","label": "고등학교 1학년","ageRange": "16–17" }, { "id": "h2","label": "2학년","ageRange": "17–18" },
+  { "id": "h3","label": "3학년 (수능 CSAT)","ageRange": "18–19" }
+], "keyExams": ["수능 (CSAT)","내신"] }] },
+{ "code": "PK", "name": "Pakistan", "flag": "🇵🇰", "curriculumBody": "FBISE / Provincial Boards", "systems": [{ "id": "pk_general", "name": "National Curriculum", "levels": [
+  { "id": "c1","label": "Class 1","ageRange": "6–7" }, { "id": "c2","label": "Class 2","ageRange": "7–8" },
+  { "id": "c3","label": "Class 3","ageRange": "8–9" }, { "id": "c4","label": "Class 4","ageRange": "9–10" },
+  { "id": "c5","label": "Class 5 (PEC)","ageRange": "10–11" }, { "id": "c6","label": "Class 6","ageRange": "11–12" },
+  { "id": "c7","label": "Class 7","ageRange": "12–13" }, { "id": "c8","label": "Class 8 (PEC)","ageRange": "13–14" },
+  { "id": "c9","label": "Class 9","ageRange": "14–15" }, { "id": "c10","label": "Class 10 (SSC / Matric)","ageRange": "15–16" },
+  { "id": "c11","label": "Class 11 (HSSC-I)","ageRange": "16–17" }, { "id": "c12","label": "Class 12 (HSSC-II)","ageRange": "17–18" }
+], "keyExams": ["PEC","SSC (Matric)","HSSC (FSc / FA)","ECAT","MDCAT"] }] },
+{ "code": "BD", "name": "Bangladesh", "flag": "🇧🇩", "curriculumBody": "NCTB / Bangladesh Board", "systems": [{ "id": "bd_general", "name": "National Curriculum", "levels": [
+  { "id": "c1","label": "Class 1","ageRange": "6–7" }, { "id": "c2","label": "Class 2","ageRange": "7–8" },
+  { "id": "c3","label": "Class 3","ageRange": "8–9" }, { "id": "c4","label": "Class 4","ageRange": "9–10" },
+  { "id": "c5","label": "Class 5 (PSC)","ageRange": "10–11" }, { "id": "c6","label": "Class 6","ageRange": "11–12" },
+  { "id": "c7","label": "Class 7","ageRange": "12–13" }, { "id": "c8","label": "Class 8 (JSC)","ageRange": "13–14" },
+  { "id": "c9","label": "Class 9","ageRange": "14–15" }, { "id": "c10","label": "Class 10 (SSC)","ageRange": "15–16" },
+  { "id": "c11","label": "Class 11 (HSC-I)","ageRange": "16–17" }, { "id": "c12","label": "Class 12 (HSC-II)","ageRange": "17–18" }
+], "keyExams": ["PSC","JSC","SSC","HSC"] }] },
+{ "code": "PH", "name": "Philippines", "flag": "🇵🇭", "curriculumBody": "DepEd (K to 12)", "systems": [{ "id": "ph_k12", "name": "K to 12 Basic Education", "levels": [
+  { "id": "kg","label": "Kindergarten","ageRange": "5–6" },
+  { "id": "g1","label": "Grade 1","ageRange": "6–7" }, { "id": "g2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "g3","label": "Grade 3","ageRange": "8–9" }, { "id": "g4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "g5","label": "Grade 5","ageRange": "10–11" }, { "id": "g6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "g7","label": "Grade 7 (JHS)","ageRange": "12–13" }, { "id": "g8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "g9","label": "Grade 9","ageRange": "14–15" }, { "id": "g10","label": "Grade 10","ageRange": "15–16" },
+  { "id": "g11","label": "Grade 11 (SHS)","ageRange": "16–17" }, { "id": "g12","label": "Grade 12","ageRange": "17–18" }
+], "keyExams": ["NAT","PISA","College Entrance Tests (UPCAT)"] }] },
+{ "code": "ID", "name": "Indonesia", "flag": "🇮🇩", "curriculumBody": "Kemdikbud / Merdeka Belajar", "systems": [{ "id": "id_merdeka", "name": "Kurikulum Merdeka", "levels": [
+  { "id": "kl1","label": "Kelas 1 (SD)","ageRange": "7–8" }, { "id": "kl2","label": "Kelas 2","ageRange": "8–9" },
+  { "id": "kl3","label": "Kelas 3","ageRange": "9–10" }, { "id": "kl4","label": "Kelas 4","ageRange": "10–11" },
+  { "id": "kl5","label": "Kelas 5","ageRange": "11–12" }, { "id": "kl6","label": "Kelas 6 (SD)","ageRange": "12–13" },
+  { "id": "kl7","label": "Kelas 7 (SMP)","ageRange": "13–14" }, { "id": "kl8","label": "Kelas 8","ageRange": "14–15" },
+  { "id": "kl9","label": "Kelas 9 (SMP)","ageRange": "15–16" },
+  { "id": "kl10","label": "Kelas 10 (SMA)","ageRange": "16–17" }, { "id": "kl11","label": "Kelas 11","ageRange": "17–18" },
+  { "id": "kl12","label": "Kelas 12 (SNPMB)","ageRange": "18–19" }
+], "keyExams": ["Asesmen Nasional","SNPMB / UTBK-SNBT"] }] },
+{ "code": "MY", "name": "Malaysia", "flag": "🇲🇾", "curriculumBody": "KPM / MOE Malaysia", "systems": [{ "id": "my_national", "name": "Kurikulum Kebangsaan", "levels": [
+  { "id": "yr1","label": "Year 1 (Primary)","ageRange": "7–8" }, { "id": "yr2","label": "Year 2","ageRange": "8–9" },
+  { "id": "yr3","label": "Year 3","ageRange": "9–10" }, { "id": "yr4","label": "Year 4","ageRange": "10–11" },
+  { "id": "yr5","label": "Year 5","ageRange": "11–12" }, { "id": "yr6","label": "Year 6 (UPSR)","ageRange": "12–13" },
+  { "id": "f1","label": "Form 1","ageRange": "13–14" }, { "id": "f2","label": "Form 2","ageRange": "14–15" },
+  { "id": "f3","label": "Form 3 (PT3)","ageRange": "15–16" }, { "id": "f4","label": "Form 4","ageRange": "16–17" },
+  { "id": "f5","label": "Form 5 (SPM)","ageRange": "17–18" }
+], "keyExams": ["UPSR","PT3","SPM","STPM"] }] },
+{ "code": "SG", "name": "Singapore", "flag": "🇸🇬", "curriculumBody": "MOE Singapore", "systems": [{ "id": "sg_national", "name": "Singapore Curriculum", "levels": [
+  { "id": "p1","label": "Primary 1","ageRange": "7–8" }, { "id": "p2","label": "Primary 2","ageRange": "8–9" },
+  { "id": "p3","label": "Primary 3","ageRange": "9–10" }, { "id": "p4","label": "Primary 4","ageRange": "10–11" },
+  { "id": "p5","label": "Primary 5","ageRange": "11–12" }, { "id": "p6","label": "Primary 6 (PSLE)","ageRange": "12–13" },
+  { "id": "s1","label": "Secondary 1","ageRange": "13–14" }, { "id": "s2","label": "Secondary 2","ageRange": "14–15" },
+  { "id": "s3","label": "Secondary 3","ageRange": "15–16" }, { "id": "s4","label": "Secondary 4 (O-Levels)","ageRange": "16–17" },
+  { "id": "jc1","label": "JC Year 1 (A-Levels)","ageRange": "17–18" }, { "id": "jc2","label": "JC Year 2","ageRange": "18–19" }
+], "keyExams": ["PSLE","GCE O-Level","GCE A-Level"] }] },
+{ "code": "AU", "name": "Australia", "flag": "🇦🇺", "curriculumBody": "ACARA", "systems": [{ "id": "au_national", "name": "Australian Curriculum", "levels": [
+  { "id": "prep","label": "Prep / Foundation","ageRange": "5–6" },
+  { "id": "yr1","label": "Year 1","ageRange": "6–7" }, { "id": "yr2","label": "Year 2","ageRange": "7–8" },
+  { "id": "yr3","label": "Year 3","ageRange": "8–9" }, { "id": "yr4","label": "Year 4","ageRange": "9–10" },
+  { "id": "yr5","label": "Year 5","ageRange": "10–11" }, { "id": "yr6","label": "Year 6","ageRange": "11–12" },
+  { "id": "yr7","label": "Year 7","ageRange": "12–13" }, { "id": "yr8","label": "Year 8","ageRange": "13–14" },
+  { "id": "yr9","label": "Year 9","ageRange": "14–15" }, { "id": "yr10","label": "Year 10","ageRange": "15–16" },
+  { "id": "yr11","label": "Year 11","ageRange": "16–17" }, { "id": "yr12","label": "Year 12 (HSC/VCE/QCE)","ageRange": "17–18" }
+], "keyExams": ["NAPLAN","HSC","VCE","QCE","ATAR"] }] },
+{ "code": "NZ", "name": "New Zealand", "flag": "🇳🇿", "curriculumBody": "MOE New Zealand", "systems": [{ "id": "nz_national", "name": "NZ Curriculum", "levels": [
+  { "id": "yr1","label": "Year 1","ageRange": "5–6" }, { "id": "yr2","label": "Year 2","ageRange": "6–7" },
+  { "id": "yr3","label": "Year 3","ageRange": "7–8" }, { "id": "yr4","label": "Year 4","ageRange": "8–9" },
+  { "id": "yr5","label": "Year 5","ageRange": "9–10" }, { "id": "yr6","label": "Year 6","ageRange": "10–11" },
+  { "id": "yr7","label": "Year 7","ageRange": "11–12" }, { "id": "yr8","label": "Year 8","ageRange": "12–13" },
+  { "id": "yr9","label": "Year 9","ageRange": "13–14" }, { "id": "yr10","label": "Year 10","ageRange": "14–15" },
+  { "id": "yr11","label": "Year 11 (NCEA L1)","ageRange": "15–16" }, { "id": "yr12","label": "Year 12 (NCEA L2)","ageRange": "16–17" },
+  { "id": "yr13","label": "Year 13 (NCEA L3)","ageRange": "17–18" }
+], "keyExams": ["NCEA Level 1","NCEA Level 2","NCEA Level 3","UE"] }] },
+{ "code": "SA", "name": "Saudi Arabia", "flag": "🇸🇦", "curriculumBody": "MEHE Saudi Arabia", "systems": [{ "id": "sa_general", "name": "National Curriculum", "levels": [
+  { "id": "g1","label": "الصف الأول الابتدائي (Grade 1)","ageRange": "6–7" }, { "id": "g2","label": "Grade 2","ageRange": "7–8" },
+  { "id": "g3","label": "Grade 3","ageRange": "8–9" }, { "id": "g4","label": "Grade 4","ageRange": "9–10" },
+  { "id": "g5","label": "Grade 5","ageRange": "10–11" }, { "id": "g6","label": "Grade 6","ageRange": "11–12" },
+  { "id": "g7","label": "Grade 7 (Intermediate)","ageRange": "12–13" }, { "id": "g8","label": "Grade 8","ageRange": "13–14" },
+  { "id": "g9","label": "Grade 9","ageRange": "14–15" }, { "id": "g10","label": "Grade 10 (Secondary)","ageRange": "15–16" },
+  { "id": "g11","label": "Grade 11","ageRange": "16–17" }, { "id": "g12","label": "Grade 12 (الثانوية العامة)","ageRange": "17–18" }
+], "keyExams": ["Qiyas SAT","National Tests","Thanawiyya Amma"] }] },
+{ "code": "OTHER", "name": "Other / International", "flag": "🌍", "curriculumBody": "IB / Cambridge International", "systems": [
+  { "id": "ib", "name": "International Baccalaureate (IB)", "levels": [
+    { "id": "pyp1","label": "PYP Year 1","ageRange": "6–7" }, { "id": "pyp2","label": "PYP Year 2","ageRange": "7–8" },
+    { "id": "pyp3","label": "PYP Year 3","ageRange": "8–9" }, { "id": "pyp4","label": "PYP Year 4","ageRange": "9–10" },
+    { "id": "pyp5","label": "PYP Year 5","ageRange": "10–11" }, { "id": "pyp6","label": "PYP Year 6","ageRange": "11–12" },
+    { "id": "myp1","label": "MYP Year 1","ageRange": "12–13" }, { "id": "myp2","label": "MYP Year 2","ageRange": "13–14" },
+    { "id": "myp3","label": "MYP Year 3","ageRange": "14–15" }, { "id": "myp4","label": "MYP Year 4","ageRange": "15–16" },
+    { "id": "myp5","label": "MYP Year 5","ageRange": "16–17" },
+    { "id": "dp1","label": "DP Year 1","ageRange": "16–17" }, { "id": "dp2","label": "DP Year 2 (IB Diploma)","ageRange": "17–18" }
+  ], "keyExams": ["IB PYP Exhibition","IB MYP eAssessment","IB Diploma"] },
+  { "id": "cambridge", "name": "Cambridge International", "levels": [
+    { "id": "ps","label": "Cambridge Primary (Yr 1–6)","ageRange": "5–11" },
+    { "id": "ls","label": "Cambridge Lower Secondary (Yr 7–9)","ageRange": "11–14" },
+    { "id": "igcse","label": "Cambridge IGCSE (Yr 10–11)","ageRange": "14–16" },
+    { "id": "as","label": "Cambridge AS Level (Yr 12)","ageRange": "16–17" },
+    { "id": "al","label": "Cambridge A Level (Yr 13)","ageRange": "17–18" }
+  ], "keyExams": ["Cambridge Primary Checkpoint","Cambridge Lower Secondary Checkpoint","IGCSE","AS Level","A Level"] }
+] }
+]}
