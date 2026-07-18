@@ -181,47 +181,48 @@ private fun ForgeNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
         Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(fc.glassBorder))
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
             horizontalArrangement = Arrangement.SpaceAround) {
-            NavIcon(route = "dashboard", icon = { Icon(Icons.Filled.Home, "Home",
+            ForgeNavItem(icon = { Icon(Icons.Filled.Home, "Home",
                 tint = if (currentRoute == "dashboard") ForgeBrand.Orange else fc.textMuted,
                 modifier = Modifier.size(22.dp)) },
-                label = "Home", selected = currentRoute == "dashboard", onClick = { onNavigate("dashboard") }, fc = fc)
+                label = "Home", selected = currentRoute == "dashboard",
+                onClick = { onNavigate("dashboard") })
 
-            NavIcon(route = "plan", icon = {
+            ForgeNavItem(icon = {
                 Text("📋", style = MaterialTheme.typography.titleSmall,
                     modifier = Modifier.size(22.dp).wrapContentSize(Alignment.Center)) },
-                label = "Plan", selected = currentRoute == "plan", onClick = { onNavigate("plan") }, fc = fc)
+                label = "Plan", selected = currentRoute == "plan",
+                onClick = { onNavigate("plan") })
 
-            NavIcon(route = "quiz/_/_", icon = {
+            ForgeNavItem(icon = {
                 Text("⭐", style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.size(22.dp).wrapContentSize(Alignment.Center)) },
                 label = "Quiz",
                 selected = currentRoute?.startsWith("quiz/") == true,
-                onClick = { onNavigate("quiz/_/_") }, fc = fc)
+                onClick = { onNavigate("quiz/_/_") })
 
-            NavIcon(route = "profile", icon = { Icon(Icons.Filled.Person, "Profile",
+            ForgeNavItem(icon = { Icon(Icons.Filled.Person, "Profile",
                 tint = if (currentRoute == "profile") ForgeBrand.Orange else fc.textMuted,
                 modifier = Modifier.size(22.dp)) },
                 label = "Profile", selected = currentRoute == "profile",
-                onClick = { onNavigate("profile") }, fc = fc)
+                onClick = { onNavigate("profile") })
 
-            NavIcon(route = "settings", icon = { Icon(Icons.Filled.Settings, "Settings",
+            ForgeNavItem(icon = { Icon(Icons.Filled.Settings, "Settings",
                 tint = if (currentRoute == "settings") ForgeBrand.Orange else fc.textMuted,
                 modifier = Modifier.size(22.dp)) },
                 label = "Settings", selected = currentRoute == "settings",
-                onClick = { onNavigate("settings") }, fc = fc)
+                onClick = { onNavigate("settings") })
         }
     }
 }
 
 @Composable
-private fun NavIcon(
-    route: String,
+private fun RowScope.ForgeNavItem(
     icon: @Composable () -> Unit,
     label: String,
     selected: Boolean,
-    onClick: () -> Unit,
-    fc: ForgeColorSet
+    onClick: () -> Unit
 ) {
+    val fc = forgeColors
     val scale by animateFloatAsState(
         targetValue = if (selected) 1.05f else 1f,
         animationSpec = spring(dampingRatio = 0.6f, stiffness = 400f),
