@@ -2,7 +2,6 @@ package com.aiteacher.ui
 
 import android.graphics.BitmapFactory
 import androidx.compose.animation.core.*
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,20 +16,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.aiteacher.onboarding.SessionItem
+import com.aiteacher.ai.XpEngine
 import java.time.Instant
 import java.time.OffsetDateTime
-
-import com.aiteacher.ai.XpEngine
 
 @Composable
 fun DashboardScreen(
@@ -51,17 +47,26 @@ fun DashboardScreen(
     val streak by vm.streak.collectAsState()
     val level = XpEngine.levelFromXp(totalXp)
     val levelProgress = XpEngine.progressInLevel(totalXp)
-    val xpToNext = XpEngine.xpToNextLevel(totalXp)
 
-    val progress = if (totalCount > 0) completedCount.toFloat() / totalCount else 0f
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress,
-        animationSpec = tween(1400, easing = FastOutSlowInEasing),
-        label = "ring"
-    )
+    val firstUpcoming = plan?.sessions?.firstOrNull {
+        try { OffsetDateTime.parse(it.isoDateTime ?: it.date).toInstant().isAfter(Instant.now()) }
+        catch (_: Exception) { true }
+    }
+    val nextSessions = plan?.sessions?.filter {
+        try { OffsetDateTime.parse(it.isoDateTime ?: it.date).toInstant().isAfter(Instant.now()) }
+        catch (_: Exception) { true }
+    }?.drop(1)?.take(4) ?: emptyList()
+
+    val greeting = remember {
+        val greetings = listOf(
+            "Ready to level up?", "Let's unlock something new.",
+            "Keep your streak alive!", "One mission today.",
+            "Today's going to be fun!", "Your adventure awaits!"
+        )
+        greetings.random()
+    }
 
     ForgeBackground {
-        // Error state with retry
         if (error != null) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -75,362 +80,237 @@ fun DashboardScreen(
             return@ForgeBackground
         }
 
-        // Loading skeleton
         if (loading) {
-            Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp).padding(top = 24.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ShimmerBlock(width = 140, height = 40)
-                    ShimmerBlock(width = 48, height = 48, shape = CircleShape)
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    CircularProgressIndicator(color = ForgeBrand.Orange, strokeWidth = 3.dp, modifier = Modifier.size(48.dp))
+                    Text("Loading your adventure…", style = MaterialTheme.typography.bodyLarge, color = forgeColors.textSecondary)
                 }
-                ShimmerBlock(width = 300, height = 140, shape = RoundedCornerShape(28.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    repeat(3) { ShimmerBlock(width = 110, height = 100, shape = RoundedCornerShape(22.dp)) }
-                }
-                ShimmerBlock(width = 200, height = 140, shape = RoundedCornerShape(24.dp))
             }
             return@ForgeBackground
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
+            modifier = Modifier.fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
-                .padding(top = 24.dp, bottom = 80.dp),
+                .padding(top = 16.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ─── Greeting + Level badge ───────────────────────────────────────
+            // ─── Compact top bar: avatar + level + streak ─────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text("Good day,",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = forgeColors.textMuted)
-                    Text(studentName,
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Black),
-                        color = forgeColors.textPrimary)
-                    // XP level + progress bar
-                    GlassCard(modifier = Modifier.width(160.dp), shape = RoundedCornerShape(14.dp)) {
-                        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Text("Lv.$level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                                    color = ForgeBrand.OrangeLight)
-                                Text("$totalXp XP", style = MaterialTheme.typography.labelSmall,
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    // Avatar
+                    Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(14.dp))
+                        .background(Brush.linearGradient(listOf(ForgeBrand.Orange, ForgeBrand.OrangeDark))),
+                        contentAlignment = Alignment.Center) {
+                        Text(studentName.take(1).uppercase(),
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = Color.White)
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                        Text(studentName, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                            color = forgeColors.textPrimary)
+                        Text(greeting, style = MaterialTheme.typography.bodySmall, color = forgeColors.textMuted)
+                    }
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    // Level badge
+                    Box(modifier = Modifier.clip(RoundedCornerShape(10.dp))
+                        .background(ForgeBrand.Orange.copy(alpha = 0.15f))
+                        .padding(horizontal = 8.dp, vertical = 4.dp)) {
+                        Text("Lv.$level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = ForgeBrand.OrangeLight)
+                    }
+                    // Streak
+                    if (streak >= 2) {
+                        Text("🔥$streak", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = ForgeBrand.Warning)
+                    }
+                }
+            }
+
+            // ─── HERO CARD: Today's Mission ─────────────────────────────────
+            if (firstUpcoming != null) {
+                val missionEmoji = when {
+                    firstUpcoming.isRevision -> "🔄"
+                    firstUpcoming.weaknessScore >= 70 -> "⚔️"
+                    else -> "📖"
+                }
+                val missionTitle = if (firstUpcoming.isRevision) "Memory Boost" else "Today's Adventure"
+                val missionSubtitle = firstUpcoming.topic
+                val missionWorld = firstUpcoming.subject.replaceFirstChar { it.uppercase() }
+                    .let { when (it) {
+                        "Math", "Mathematics" -> "🏰 Math Kingdom"
+                        "Science" -> "🧪 Science Lab"
+                        "English" -> "📚 English Library"
+                        "History" -> "🌍 History Explorer"
+                        "Ict", "Computing" -> "💻 Code Factory"
+                        "Arts" -> "🎨 Creative Studio"
+                        else -> it
+                    }}
+                val xpReward = XpEngine.XP_SESSION_COMPLETE + if (firstUpcoming.weaknessScore >= 60) 20 else 0
+
+                Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp))
+                    .background(Brush.verticalGradient(
+                        0.0f to ForgeBrand.Orange,
+                        0.5f to ForgeBrand.OrangeDark,
+                        1.0f to Color(0xFF1A0A00)
+                    ))) {
+                    Column(modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        // Mission header
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(missionEmoji, style = MaterialTheme.typography.titleLarge)
+                            Surface(shape = RoundedCornerShape(20.dp), color = Color.White.copy(alpha = 0.15f)) {
+                                Text(missionWorld, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                    color = Color.White)
+                            }
+                        }
+                        Text(missionTitle, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
+                            color = Color.White)
+                        Text(missionSubtitle, style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White.copy(alpha = 0.9f))
+
+                        // Progress bar + duration
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            LinearProgressIndicator(
+                                progress = if (totalCount > 0) completedCount.toFloat() / totalCount else 0f,
+                                modifier = Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)),
+                                color = Color.White.copy(alpha = 0.8f), trackColor = Color.White.copy(alpha = 0.2f)
+                            )
+                            Text("${firstUpcoming.duration} min", style = MaterialTheme.typography.labelMedium,
+                                color = Color.White.copy(alpha = 0.8f))
+                        }
+
+                        // Reward row
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween) {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text("⭐", style = MaterialTheme.typography.titleSmall)
+                                Text("+$xpReward XP", style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                    color = Color.White)
+                            }
+                            if (firstUpcoming.weaknessScore >= 50) {
+                                Surface(shape = RoundedCornerShape(10.dp), color = ForgeBrand.Warning.copy(alpha = 0.3f)) {
+                                    Text("Focus area", modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                        style = MaterialTheme.typography.labelSmall, color = ForgeBrand.Warning)
+                                }
+                            }
+                        }
+
+                        // CTA button
+                        Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
+                            .background(Color.White.copy(alpha = 0.2f))
+                            .clickable { onNavigateToPlan() }
+                            .padding(vertical = 14.dp), contentAlignment = Alignment.Center) {
+                            Text(if (firstUpcoming.isRevision) "▶ Start Memory Boost" else "▶ Continue Adventure",
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                                color = Color.White)
+                        }
+                    }
+                }
+
+                // ─── XP progress bar (thin, below hero) ──────────────────────
+                GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Text("⭐", style = MaterialTheme.typography.titleSmall)
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Level $level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                                    color = forgeColors.textPrimary)
+                                Text("$totalXp / ${(level) * 200} XP", style = MaterialTheme.typography.labelSmall,
                                     color = forgeColors.textMuted)
                             }
-                            LinearProgressIndicator(
-                                progress = levelProgress,
+                            LinearProgressIndicator(progress = levelProgress,
                                 modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
-                                color = ForgeBrand.Orange, trackColor = forgeColors.glassBorder
-                            )
-                            if (streak >= 2) {
-                                Text("🔥 $streak-day streak",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = ForgeBrand.Warning)
+                                color = ForgeBrand.Orange, trackColor = forgeColors.glassBorder)
+                        }
+                    }
+                }
+            }
+
+            // ─── Subject mastery bars ──────────────────────────────────────────
+            val subjectScores by vm.subjectScores.collectAsState()
+            if (subjectScores.isNotEmpty()) {
+                GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Text("This Week", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            color = forgeColors.textSecondary)
+                        subjectScores.entries.take(4).forEach { (subject, score) ->
+                            val world = when {
+                                subject.contains("math", ignoreCase = true) -> "🏰 Math"
+                                subject.contains("science", ignoreCase = true) -> "🧪 Science"
+                                subject.contains("english", ignoreCase = true) -> "📚 English"
+                                subject.contains("history", ignoreCase = true) -> "🌍 History"
+                                subject.contains("ict", ignoreCase = true) || subject.contains("comput", ignoreCase = true) -> "💻 Code"
+                                else -> "📖 ${subject.replaceFirstChar { it.uppercase() }}"
+                            }
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                Text(world, style = MaterialTheme.typography.bodySmall, color = forgeColors.textPrimary,
+                                    modifier = Modifier.width(90.dp))
+                                LinearProgressIndicator(progress = score / 100f,
+                                    modifier = Modifier.weight(1f).height(7.dp).clip(RoundedCornerShape(4.dp)),
+                                    color = when { score >= 70 -> ForgeBrand.Success; score >= 40 -> ForgeBrand.Warning; else -> ForgeBrand.Error },
+                                    trackColor = forgeColors.glassBorder)
+                                Text("$score%", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = forgeColors.textMuted, modifier = Modifier.width(34.dp), textAlign = TextAlign.End)
                             }
                         }
                     }
                 }
-                // Avatar with orange glow
-                Box(
-                    modifier = Modifier.size(48.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier.size(48.dp).clip(CircleShape)
-                            .background(ForgeBrand.Orange.copy(alpha = 0.12f))
-                    )
-                    Box(
-                        modifier = Modifier.size(42.dp).clip(CircleShape)
-                            .background(
-                                Brush.linearGradient(listOf(
-                                    ForgeBrand.Orange, ForgeBrand.OrangeDark
-                                ))
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(studentName.take(1).uppercase(),
-                            style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold),
-                            color = Color.White)
+            }
+
+            // ─── Next Unlocks (horizontal card stack) ─────────────────────────
+            if (nextSessions.isNotEmpty()) {
+                Text("Next Unlocks", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                    color = forgeColors.textSecondary)
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    nextSessions.forEach { session ->
+                        val emoji = when {
+                            session.isRevision -> "🔄"
+                            session.weaknessScore >= 70 -> "⚔️"
+                            else -> "📖"
+                        }
+                        GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                            Row(modifier = Modifier.padding(14.dp).fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Box(modifier = Modifier.size(36.dp).clip(RoundedCornerShape(12.dp))
+                                    .background(ForgeBrand.Orange.copy(alpha = 0.12f)),
+                                    contentAlignment = Alignment.Center) {
+                                    Text(emoji, style = MaterialTheme.typography.titleMedium)
+                                }
+                                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                                    Text(session.topic, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                                        color = forgeColors.textPrimary)
+                                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                        Text(session.date, style = MaterialTheme.typography.bodySmall, color = forgeColors.textMuted)
+                                        Text("${session.duration}m", style = MaterialTheme.typography.bodySmall, color = forgeColors.textMuted)
+                                    }
+                                }
+                                if (session.isRevision) {
+                                    Surface(shape = RoundedCornerShape(8.dp), color = ForgeBrand.Teal.copy(alpha = 0.15f)) {
+                                        Text("Boost", modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                            color = ForgeBrand.Teal)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-
-            // ─── Progress ring card ────────────────────────────────────────────
-            GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(28.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(24.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Column(modifier = Modifier.weight(1f).padding(end = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OrangeAccentHeader(title = "Study Progress")
-                        Text("$completedCount of $totalCount sessions",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = forgeColors.textSecondary)
-                        Spacer(Modifier.height(4.dp))
-                        ForgeButton(
-                            text = "View Plan",
-                            onClick = onNavigateToPlan,
-                            modifier = Modifier.width(140.dp),
-                            height = 44.dp
-                        )
-                    }
-                    DashboardProgressRing(progress = animatedProgress)
-                }
-            }
-
-            // ─── Stats row ────────────────────────────────────────────────────
-            Row(modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                StatCard(modifier = Modifier.weight(1f),
-                    emoji = "✅", tint = ForgeBrand.Success,
-                    value = "$completedCount", label = "Done")
-                StatCard(modifier = Modifier.weight(1f),
-                    emoji = "⭐", tint = ForgeBrand.Gold,
-                    value = "${totalCount - completedCount}", label = "Left")
-                StatCard(modifier = Modifier.weight(1f),
-                    emoji = "📅", tint = ForgeBrand.Orange,
-                    value = "${plan?.weeks ?: 0}", label = "Weeks")
-            }
-
-            // ─── Next session ─────────────────────────────────────────────────
-            val nextSession = plan?.sessions?.firstOrNull {
-                try { OffsetDateTime.parse(it.isoDateTime ?: it.date)
-                    .toInstant().isAfter(Instant.now())
-                } catch (_: Exception) { true }
-            }
-
-            if (nextSession != null) {
-                SectionLabel("Next Session")
-                NextSessionBanner(session = nextSession)
-            }
-
-            // ─── Upcoming list ────────────────────────────────────────────────
-            val upcoming = plan?.sessions?.filter {
-                try { OffsetDateTime.parse(it.isoDateTime ?: it.date)
-                    .toInstant().isAfter(Instant.now())
-                } catch (_: Exception) { true }
-            }?.drop(1)?.take(5) ?: emptyList()
-
-            if (upcoming.isNotEmpty()) {
-                SectionLabel("Upcoming")
-                Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    upcoming.forEachIndexed { idx, session ->
-                        UpcomingRow(session = session, isLast = idx == upcoming.lastIndex)
-                    }
-                }
-            }
-
-            // ─── Welcome image ────────────────────────────────────────────────
-            val bitmap = remember {
-                try { BitmapFactory.decodeStream(ctx.assets.open("dashboard_welcome.png")) }
-                catch (_: Exception) { null }
-            }
-            if (bitmap != null) {
-                Image(bitmap = bitmap.asImageBitmap(), contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(160.dp)
-                        .clip(RoundedCornerShape(24.dp)))
             }
 
             Spacer(Modifier.height(8.dp))
-        }
-    }
-}
-
-// ─── Dashboard progress ring ───────────────────────────────────────────────────
-
-@Composable
-private fun DashboardProgressRing(progress: Float) {
-    val fc = forgeColors
-    var pulse by remember { mutableStateOf(false) }
-    val pulseAlpha by animateFloatAsState(
-        targetValue = if (progress > 0.5f || pulse) 1f else 0.6f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "ringPulse"
-    )
-    LaunchedEffect(progress) {
-        if (progress >= 1f) pulse = true
-    }
-
-    Box(modifier = Modifier.size(110.dp), contentAlignment = Alignment.Center) {
-        // Outer glow ring
-        Canvas(modifier = Modifier.size(110.dp)) {
-            val outerStroke = 14.dp.toPx()
-            val outerInset = outerStroke / 2
-            val outerArcSize = Size(size.width - outerStroke, size.height - outerStroke)
-            drawArc(
-                color = ForgeBrand.Orange.copy(alpha = 0.06f),
-                startAngle = -90f, sweepAngle = 360f,
-                useCenter = false,
-                topLeft = Offset(outerInset, outerInset),
-                size = outerArcSize,
-                style = Stroke(outerStroke, cap = StrokeCap.Round)
-            )
-        }
-        // Main ring
-        Canvas(modifier = Modifier.size(92.dp)) {
-            val stroke = 9.dp.toPx()
-            val inset = stroke / 2
-            val arcSize = Size(size.width - stroke, size.height - stroke)
-            val topLeft = Offset(inset, inset)
-            // Track
-            drawArc(color = fc.glassBorder, startAngle = -90f, sweepAngle = 360f,
-                useCenter = false, topLeft = topLeft, size = arcSize,
-                style = Stroke(stroke, cap = StrokeCap.Round))
-            if (progress > 0f) {
-                // Gradient arc
-                drawArc(
-                    brush = Brush.sweepGradient(
-                        0f to ForgeBrand.Orange,
-                        0.5f to ForgeBrand.Orange,
-                        1f to ForgeBrand.Success,
-                        center = Offset(size.width / 2, size.height / 2)
-                    ),
-                    startAngle = -90f, sweepAngle = progress * 360f,
-                    useCenter = false, topLeft = topLeft, size = arcSize,
-                    style = Stroke(stroke, cap = StrokeCap.Round)
-                )
-            }
-        }
-        // Percentage text
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("${(progress * 100).toInt()}%",
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
-                color = fc.textPrimary)
-            Text("complete",
-                style = MaterialTheme.typography.labelSmall,
-                color = fc.textMuted)
-        }
-    }
-}
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
-
-@Composable
-private fun StatCard(
-    modifier: Modifier,
-    emoji: String,
-    tint: Color,
-    value: String,
-    label: String
-) {
-    GlassCard(modifier = modifier, shape = RoundedCornerShape(22.dp)) {
-        Column(modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(emoji, style = MaterialTheme.typography.titleLarge)
-            Text(value,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black),
-                color = forgeColors.textPrimary)
-            Text(label,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = androidx.compose.ui.unit.TextUnit(
-                        0.8f, androidx.compose.ui.unit.TextUnitType.Sp
-                    )
-                ),
-                color = tint)
-        }
-    }
-}
-
-// ─── Next session banner ──────────────────────────────────────────────────────
-
-@Composable
-private fun NextSessionBanner(session: SessionItem) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .clip(RoundedCornerShape(24.dp))
-        .background(Brush.horizontalGradient(listOf(
-            ForgeBrand.Orange, ForgeBrand.OrangeDark
-        )))
-    ) {
-        Column(modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(session.topic,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Black),
-                color = Color.White)
-            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                Text("📆 ${session.date}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f))
-                Text("⏱ ${session.duration} min",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.85f))
-            }
-            if (!session.isoDateTime.isNullOrBlank()) {
-                val t = session.isoDateTime.take(16).replace("T", " at ")
-                Text("🕐 $t",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.White.copy(alpha = 0.7f))
-            }
-        }
-    }
-}
-
-// ─── Upcoming row ─────────────────────────────────────────────────────────────
-
-@Composable
-private fun UpcomingRow(session: SessionItem, isLast: Boolean) {
-    val fc = forgeColors
-    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        // Timeline gutter with gradient connector
-        Column(horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.width(28.dp)) {
-            Box(modifier = Modifier.size(12.dp).clip(CircleShape)
-                .background(ForgeBrand.Success)
-                .border(2.dp, ForgeBrand.Success.copy(0.3f), CircleShape))
-            if (!isLast) {
-                Box(modifier = Modifier.width(3.dp).height(60.dp)
-                    .background(
-                        Brush.verticalGradient(listOf(
-                            ForgeBrand.Success, fc.glassBorder
-                        ))
-                    ))
-            }
-        }
-        Spacer(Modifier.width(12.dp))
-        GlassCard(modifier = Modifier.weight(1f)
-            .padding(bottom = if (isLast) 0.dp else 8.dp),
-            shape = RoundedCornerShape(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth().padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically) {
-                Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(session.topic,
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.SemiBold),
-                        color = fc.textPrimary)
-                    Text(session.date,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = fc.textMuted)
-                }
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = ForgeBrand.Success.copy(alpha = 0.12f)
-                ) {
-                    Text("${session.duration}m",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold),
-                        color = ForgeBrand.Success)
-                }
-            }
         }
     }
 }

@@ -9,9 +9,10 @@ import androidx.room.RoomDatabase
     entities = [
         PlanEntity::class, SessionEntity::class,
         StudentProfileEntity::class, ProgressEntity::class,
-        QuizResultEntity::class, ExamResultEntity::class, StudySessionEntity::class
+        QuizResultEntity::class, ExamResultEntity::class, StudySessionEntity::class,
+        com.aiteacher.model.TopicKnowledgeEntity::class
     ],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun planDao(): PlanDao
@@ -20,6 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun quizResultDao(): QuizResultDao
     abstract fun examResultDao(): ExamResultDao
     abstract fun studySessionDao(): StudySessionDao
+    abstract fun topicKnowledgeDao(): com.aiteacher.model.TopicKnowledgeDao
 
     companion object {
         private const val DB_NAME = "aiteacher.db"
@@ -43,21 +45,23 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val MIGRATION_2_3 = object : androidx.room.migration.Migration(2, 3) {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-                // add studentId column to plans (nullable)
                 db.execSQL("ALTER TABLE plans ADD COLUMN studentId INTEGER")
-                // add status column to sessions with default
                 db.execSQL("ALTER TABLE sessions ADD COLUMN status TEXT NOT NULL DEFAULT 'scheduled'")
-                // create students table
                 db.execSQL("CREATE TABLE IF NOT EXISTS `students` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `timezone` TEXT, `createdAt` INTEGER, `updatedAt` INTEGER)")
-                // create progress table
                 db.execSQL("CREATE TABLE IF NOT EXISTS `progress` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `sessionId` INTEGER NOT NULL, `status` TEXT NOT NULL, `notes` TEXT, `score` INTEGER, FOREIGN KEY(`sessionId`) REFERENCES `sessions`(`id`) ON DELETE CASCADE)")
+            }
+        }
+
+        private val MIGRATION_4_5 = object : androidx.room.migration.Migration(4, 5) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `topic_knowledge` (`topicId` TEXT NOT NULL PRIMARY KEY, `subject` TEXT NOT NULL, `mastery` INTEGER NOT NULL DEFAULT 0, `confidence` INTEGER NOT NULL DEFAULT 0, `recallStrength` INTEGER NOT NULL DEFAULT 0, `recognitionStrength` INTEGER NOT NULL DEFAULT 0, `decayRate` REAL NOT NULL DEFAULT 0.5, `lastReviewTimestamp` INTEGER NOT NULL DEFAULT 0, `nextReviewTimestamp` INTEGER NOT NULL DEFAULT 0, `totalAttempts` INTEGER NOT NULL DEFAULT 0, `correctAttempts` INTEGER NOT NULL DEFAULT 0, `avgResponseTimeMs` INTEGER NOT NULL DEFAULT 0, `guessingTendency` INTEGER NOT NULL DEFAULT 0, `misconceptionsJson` TEXT NOT NULL DEFAULT '[]', `isUnlocked` INTEGER NOT NULL DEFAULT 1, `isBlocked` INTEGER NOT NULL DEFAULT 0, `transferScore` INTEGER NOT NULL DEFAULT 0, `learningVelocity` REAL NOT NULL DEFAULT 0.0, `stressScore` INTEGER NOT NULL DEFAULT 0, `lastSessionDurationSec` INTEGER NOT NULL DEFAULT 0, `streakCorrect` INTEGER NOT NULL DEFAULT 0)")
             }
         }
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                         val inst = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME)
-                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                             .build()
                         INSTANCE = inst
                         inst
