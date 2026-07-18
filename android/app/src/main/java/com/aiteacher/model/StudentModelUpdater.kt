@@ -1,5 +1,6 @@
 package com.aiteacher.model
 
+import com.aiteacher.ai.MisconceptionAgent
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.onboarding.CapabilityQuestion
 import com.google.gson.Gson
@@ -14,6 +15,7 @@ import java.time.Instant
  * - Updates TopicKnowledgeEntity for each affected topic
  * - Re-weights weakness scores via WeaknessReweighter
  * - Calculates spaced-repetition metrics (decay rate, next review)
+ * - Runs MisconceptionAgent to identify root causes of wrong answers
  *
  * Call after every learning activity.
  */
@@ -73,6 +75,12 @@ object StudentModelUpdater {
             // Learning velocity: change in mastery per session
             val velocity = (newMastery - prevMastery).toFloat()
 
+            // Run MisconceptionAgent to analyse wrong answers
+            val newMisconceptions = MisconceptionAgent.analyse(qs, selectedAnswers)
+            val existingMisconceptionsJson = existing?.misconceptionsJson ?: "[]"
+            val mergedMisconceptions = MisconceptionAgent.mergeWithExisting(newMisconceptions, existingMisconceptionsJson)
+            val misconceptionsJson = MisconceptionAgent.toJson(mergedMisconceptions)
+
             dao.upsert(
                 TopicKnowledgeEntity(
                     topicId = topicId,
@@ -88,6 +96,7 @@ object StudentModelUpdater {
                     correctAttempts = (existing?.correctAttempts ?: 0) + correctCount,
                     avgResponseTimeMs = if (avgResponseTimeMs > 0) avgResponseTimeMs else (existing?.avgResponseTimeMs ?: 0),
                     guessingTendency = guessing,
+                    misconceptionsJson = misconceptionsJson,
                     isUnlocked = true,
                     learningVelocity = velocity,
                     lastSessionDurationSec = avgResponseTimeMs / 1000,
