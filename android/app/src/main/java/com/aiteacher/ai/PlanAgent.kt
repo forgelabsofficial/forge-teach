@@ -2,6 +2,7 @@ package com.aiteacher.ai
 
 import android.content.Context
 import android.util.Log
+import com.aiteacher.data.AppDatabase
 import com.aiteacher.onboarding.Plan
 import com.aiteacher.onboarding.RankedTopic
 import com.aiteacher.onboarding.SessionItem
