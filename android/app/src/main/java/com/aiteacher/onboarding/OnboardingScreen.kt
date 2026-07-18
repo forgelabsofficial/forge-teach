@@ -919,12 +919,13 @@ private fun CapabilityTestStep(
                         val allAnswered = questions.all {
                             testAnswers.containsKey(it.id)
                         }
-                        ForgeButton(
-                            text = "Submit ✓",
-                            onClick = {
-                                vm.submitTest()
-                                vm.generateAiPlan(ctx)
-                            },
+                                ForgeButton(
+                                    text = "Submit ✓",
+                                    onClick = {
+                                        vm.submitTest()
+                                        vm.seedStudentModel(ctx)
+                                        vm.generateAiPlan(ctx)
+                                    },
                             enabled = allAnswered,
                             modifier = Modifier.weight(2f),
                             height = 52.dp,
@@ -934,8 +935,8 @@ private fun CapabilityTestStep(
                 }
 
                 TextButton(onClick = {
-                    // Ensure scoring data exists before advancing.
                     vm.submitTest()
+                    vm.seedStudentModel(ctx)
                     onNext()
                 },
                     modifier = Modifier.fillMaxWidth()) {
@@ -956,6 +957,7 @@ private fun CapabilityTestStep(
                         modifier = Modifier.weight(1f), height = 52.dp)
                     TextButton(onClick = {
                         vm.submitTest()
+                        vm.seedStudentModel(ctx)
                         onNext()
                     },
                         modifier = Modifier.weight(1f).height(52.dp)) {

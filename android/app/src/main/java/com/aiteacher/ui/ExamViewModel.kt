@@ -8,6 +8,7 @@ import com.aiteacher.ai.CapabilityTestClient
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.data.ExamResultEntity
+import com.aiteacher.model.StudentModelUpdater
 import com.aiteacher.onboarding.CapabilityQuestion
 import com.aiteacher.onboarding.StudentProfile
 import com.aiteacher.ui.DataStoreUtils
@@ -156,6 +157,14 @@ class ExamViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
             DataStoreUtils.recordActivity(ctx, xp)
+
+            // Update student model with exam results per subject
+            StudentModelUpdater.recordQuizOrExam(
+                db = db,
+                questions = qs,
+                selectedAnswers = answers,
+                avgResponseTimeMs = (cfg.durationMinutes * 60 - _remainingSeconds.value) * 1000
+            )
         }
     }
 

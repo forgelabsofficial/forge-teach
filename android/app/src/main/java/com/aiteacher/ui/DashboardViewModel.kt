@@ -7,6 +7,7 @@ import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.data.PlanRepository
 import com.aiteacher.data.StudySessionEntity
+import com.aiteacher.model.StudentModelUpdater
 import com.aiteacher.onboarding.Plan
 import com.aiteacher.onboarding.SessionItem
 import com.aiteacher.onboarding.StudentProfile
@@ -116,11 +117,28 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                         catch (_: Exception) { false }
                     } ?: 0
 
-                    // Subject scores from quiz results
+                    // Subject scores — blend TopicKnowledge model mastery with quiz results
                     val quizDao = db.quizResultDao()
                     val allQuizResults = quizDao.getAll()
-                    val subjectMap = allQuizResults.groupBy { it.subject }
+                    val quizSubjectMap = allQuizResults.groupBy { it.subject }
                         .mapValues { (_, results) -> results.map { it.scorePercent }.average().toInt() }
+
+                    // Read from student model (TopicKnowledge) — these are more accurate
+                    val modelSubjectMap = StudentModelUpdater.getAllSubjectMasteries(db)
+
+                    // Blend: model takes priority (60%), quiz results backfill (40%)
+                    val allSubjects = (quizSubjectMap.keys + modelSubjectMap.keys).toSet()
+                    val subjectMap = allSubjects.mapNotNull { subject ->
+                        val modelScore = modelSubjectMap[subject]
+                        val quizScore = quizSubjectMap[subject]
+                        val blended = when {
+                            modelScore != null && quizScore != null -> (modelScore * 0.6f + quizScore * 0.4f).toInt()
+                            modelScore != null -> modelScore
+                            quizScore != null -> quizScore
+                            else -> null
+                        }
+                        blended?.let { subject to it }
+                    }.toMap()
 
                     // Today's focus: highest-rank upcoming session
                     val focus = p?.sessions?.filter {
@@ -194,6 +212,15 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             )
             DataStoreUtils.recordActivity(ctx, xp)
             _totalXp.value += xp
+
+            // Update student model with study session
+            StudentModelUpdater.recordStudySession(
+                db = db,
+                subject = session.subject,
+                topic = session.topic,
+                durationSeconds = elapsed,
+                xpEarned = xp
+            )
         }
         _activeSession.value = null
         _sessionElapsedSeconds.value = 0

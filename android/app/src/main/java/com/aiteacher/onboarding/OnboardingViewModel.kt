@@ -9,6 +9,8 @@ import com.aiteacher.ai.AgentPipeline
 import com.aiteacher.ai.CapabilityTestClient
 import com.aiteacher.ai.ModelInfo
 import com.aiteacher.ai.ModelRegistry
+import com.aiteacher.data.AppDatabase
+import com.aiteacher.model.StudentModelUpdater
 import com.aiteacher.security.SecureStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -263,6 +265,19 @@ class OnboardingViewModel : ViewModel() {
 
     fun answerTestQuestion(questionId: String, selectedIndex: Int) {
         _testAnswers.value = _testAnswers.value.toMutableMap().also { it[questionId] = selectedIndex }
+    }
+
+    /**
+     * Seed the student model with initial mastery scores from the capability test.
+     * Call after submitTest() with the application context.
+     */
+    fun seedStudentModel(context: Context) {
+        val test = _capabilityTest.value ?: return
+        val answers = _testAnswers.value
+        viewModelScope.launch(Dispatchers.IO) {
+            val db = AppDatabase.getInstance(context.applicationContext)
+            StudentModelUpdater.seedFromCapabilityTest(db, test.questions, answers)
+        }
     }
 
     fun submitTest() {
