@@ -12,7 +12,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -187,9 +186,9 @@ private fun ForgeNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
                 modifier = Modifier.size(22.dp)) },
                 label = "Home", selected = currentRoute == "dashboard", onClick = { onNavigate("dashboard") }, fc = fc)
 
-            NavIcon(route = "plan", icon = { Icon(Icons.Filled.List, "Plan",
-                tint = if (currentRoute == "plan") ForgeBrand.Orange else fc.textMuted,
-                modifier = Modifier.size(22.dp)) },
+            NavIcon(route = "plan", icon = {
+                Text("📋", style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.size(22.dp).wrapContentSize(Alignment.Center)) },
                 label = "Plan", selected = currentRoute == "plan", onClick = { onNavigate("plan") }, fc = fc)
 
             NavIcon(route = "quiz/_/_", icon = {
