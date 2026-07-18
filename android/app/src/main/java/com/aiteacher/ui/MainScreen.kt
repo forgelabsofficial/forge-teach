@@ -221,7 +221,7 @@ private fun NavIcon(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
-    fc: ForgeColors
+    fc: ForgeColorSet
 ) {
     val scale by animateFloatAsState(
         targetValue = if (selected) 1.05f else 1f,

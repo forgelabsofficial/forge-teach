@@ -9,9 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -136,7 +133,8 @@ private fun PlanTimelineItem(
                 Box(modifier = Modifier.size(22.dp).clip(CircleShape)
                     .background(ForgeBrand.Success.copy(0.15f)),
                     contentAlignment = Alignment.Center) {
-                    Icon(Icons.Filled.CheckCircle, null, tint = ForgeBrand.Success, modifier = Modifier.size(18.dp))
+                    Text("✓", style = MaterialTheme.typography.labelSmall,
+                        color = ForgeBrand.Success, fontWeight = FontWeight.Bold)
                 }
             } else {
                 Box(modifier = Modifier.size(16.dp).clip(CircleShape)
@@ -156,10 +154,9 @@ private fun PlanTimelineItem(
                     verticalAlignment = Alignment.CenterVertically) {
                     Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Icon(if (isDone) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked,
-                            contentDescription = if (isDone) "Mark incomplete" else "Mark complete",
-                            tint = if (isDone) ForgeBrand.Success else fc.textMuted,
-                            modifier = Modifier.size(24.dp).clickable { onToggleComplete() })
+                        Text(if (isDone) "✅" else "⭕",
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.clickable { onToggleComplete() })
                         Text(session.topic,
                             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
                             color = if (isDone) fc.textMuted else fc.textPrimary,
