@@ -12,11 +12,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,11 +31,6 @@ import java.time.Instant
 import java.time.OffsetDateTime
 
 import com.aiteacher.ai.XpEngine
-import com.aiteacher.data.ExamResultEntity
-import com.aiteacher.data.QuizResultEntity
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @Composable
 fun DashboardScreen(
@@ -56,6 +46,12 @@ fun DashboardScreen(
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
     val ctx = LocalContext.current
+
+    val totalXp by vm.totalXp.collectAsState()
+    val streak by vm.streak.collectAsState()
+    val level = XpEngine.levelFromXp(totalXp)
+    val levelProgress = XpEngine.progressInLevel(totalXp)
+    val xpToNext = XpEngine.xpToNextLevel(totalXp)
 
     val progress = if (totalCount > 0) completedCount.toFloat() / totalCount else 0f
     val animatedProgress by animateFloatAsState(
@@ -104,11 +100,11 @@ fun DashboardScreen(
                 .padding(top = 24.dp, bottom = 80.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // ─── Greeting ─────────────────────────────────────────────────────
+            // ─── Greeting + Level badge ───────────────────────────────────────
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.Top
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text("Good day,",
@@ -118,6 +114,30 @@ fun DashboardScreen(
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Black),
                         color = forgeColors.textPrimary)
+                    // XP level + progress bar
+                    GlassCard(modifier = Modifier.width(160.dp), shape = RoundedCornerShape(14.dp)) {
+                        Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Row(modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Text("Lv.$level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = ForgeBrand.OrangeLight)
+                                Text("$totalXp XP", style = MaterialTheme.typography.labelSmall,
+                                    color = forgeColors.textMuted)
+                            }
+                            LinearProgressIndicator(
+                                progress = levelProgress,
+                                modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
+                                color = ForgeBrand.Orange, trackColor = forgeColors.glassBorder
+                            )
+                            if (streak >= 2) {
+                                Text("🔥 $streak-day streak",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = ForgeBrand.Warning)
+                            }
+                        }
+                    }
                 }
                 // Avatar with orange glow
                 Box(

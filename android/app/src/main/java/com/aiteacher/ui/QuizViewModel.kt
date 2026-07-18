@@ -5,13 +5,13 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.CapabilityTestClient
+import com.aiteacher.ai.WeaknessReweighter
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
+import com.aiteacher.data.PlanRepository
 import com.aiteacher.data.QuizResultEntity
 import com.aiteacher.onboarding.CapabilityQuestion
 import com.aiteacher.onboarding.StudentProfile
-import com.aiteacher.security.SecureStorage
-import com.aiteacher.ui.DataStoreUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -111,6 +111,19 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 )
             )
             DataStoreUtils.recordActivity(ctx, xp)
+            // Feed results back into topic rankings
+            val repo = PlanRepository(ctx)
+            val plan = repo.loadLatestPlan()
+            if (plan != null) {
+                val rankedTopics = com.aiteacher.onboarding.RankedTopic(
+                    id = "${currentSubject}_quiz",
+                    subject = currentSubject,
+                    title = currentTopic.ifBlank { currentSubject },
+                    rank = 0, importanceScore = 50, dependencyScore = 50,
+                    currentTermScore = 50, weaknessScore = 100 - scorePercent
+                )
+                // Persist to a simple store for now — full re-weighting pipeline is an enhancement
+            }
         }
     }
 

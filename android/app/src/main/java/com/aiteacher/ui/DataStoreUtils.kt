@@ -21,7 +21,7 @@ object DataStoreUtils {
     private val STREAK_KEY           = intPreferencesKey("streak_days")
     private val LAST_STUDY_DAY_KEY   = longPreferencesKey("last_study_day_epoch")
     private val TOTAL_XP_KEY         = intPreferencesKey("total_xp")
-
+    private val COMPLETED_SESSIONS_KEY = stringPreferencesKey("completed_sessions_json")
     suspend fun saveAssessment(context: Context, assessment: Assessment) {
         val json = Gson().toJson(assessment)
         context.dataStore.edit { prefs -> prefs[ASSESSMENT_KEY] = json }
@@ -76,5 +76,18 @@ object DataStoreUtils {
             prefs[LAST_STUDY_DAY_KEY] = todayEpochDay
             prefs[TOTAL_XP_KEY] = (prefs[TOTAL_XP_KEY] ?: 0) + xpGained
         }
+    }
+
+    // ── Completed sessions persistence ─────────────────────────────────────────
+
+    suspend fun saveCompletedKeys(context: Context, keys: Set<String>) {
+        context.dataStore.edit { prefs ->
+            prefs[COMPLETED_SESSIONS_KEY] = keys.joinToString(",")
+        }
+    }
+
+    suspend fun loadCompletedKeys(context: Context): Set<String> {
+        val raw = context.dataStore.data.first()[COMPLETED_SESSIONS_KEY] ?: return emptySet()
+        return raw.split(",").filter { it.isNotBlank() }.toSet()
     }
 }

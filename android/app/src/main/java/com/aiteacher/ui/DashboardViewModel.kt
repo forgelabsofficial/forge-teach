@@ -54,6 +54,13 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
     private val _totalXp = MutableStateFlow(0)
     val totalXp: StateFlow<Int> = _totalXp
 
+    val level: Int get() = XpEngine.levelFromXp(_totalXp.value)
+    val xpToNext: Int get() = XpEngine.xpToNextLevel(_totalXp.value)
+    val levelProgress: Float get() = XpEngine.progressInLevel(_totalXp.value)
+
+    private val _completedSessionsSet = MutableStateFlow<Set<String>>(emptySet())
+    val completedSessionsSet: StateFlow<Set<String>> = _completedSessionsSet
+
     private val _subjectScores = MutableStateFlow<Map<String, Int>>(emptyMap())
     val subjectScores: StateFlow<Map<String, Int>> = _subjectScores
 

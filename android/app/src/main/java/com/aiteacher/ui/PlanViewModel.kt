@@ -1,7 +1,6 @@
 package com.aiteacher.ui
 
 import android.app.Application
-import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.AiClient
@@ -47,6 +46,9 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadPlan() {
         viewModelScope.launch {
             _loading.value = true
+            // Load persisted completed keys first
+            _completedKeys.value = withContext(Dispatchers.IO) { DataStoreUtils.loadCompletedKeys(ctx) }
+
             val existing = withContext(Dispatchers.IO) { repo.loadLatestPlan() }
             if (existing != null) {
                 _plan.value = existing
@@ -95,6 +97,10 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
         val current = _completedKeys.value.toMutableSet()
         if (current.contains(key)) current.remove(key) else current.add(key)
         _completedKeys.value = current
+        // Persist immediately
+        viewModelScope.launch {
+            DataStoreUtils.saveCompletedKeys(ctx, current)
+        }
     }
 
     fun regenerate() {
