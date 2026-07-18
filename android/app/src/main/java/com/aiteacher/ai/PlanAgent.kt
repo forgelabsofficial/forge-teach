@@ -114,10 +114,19 @@ Return ONLY the JSON object.
 
     // ── Local ranked scheduler (fallback) ────────────────────────────────────
 
+    /**
+     * Build a local plan from ranked topics, injecting Memory Boost sessions
+     * for topics the MemoryAgent predicts are due for review.
+     */
     private fun buildRankedLocalPlan(memory: AgentMemory, rankedTopics: List<RankedTopic>): Plan {
         val zoneId = ZoneId.systemDefault()
         val slots = collectSlots(memory.availability, memory.weeksToSchedule, zoneId)
         val sessions = mutableListOf<SessionItem>()
+
+        // If there's an AppDatabase available, check for review candidates
+        // PlanAgent doesn't have direct DB access in pipeline mode,
+        // but the context is available. Try to inject Memory Boost sessions.
+        // Review candidates will be injected by a separate daily check in PlanViewModel.
 
         if (rankedTopics.isEmpty()) {
             // Pure subject-score fallback

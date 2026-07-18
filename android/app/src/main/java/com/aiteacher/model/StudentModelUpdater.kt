@@ -1,5 +1,6 @@
 package com.aiteacher.model
 
+import com.aiteacher.ai.MemoryAgent
 import com.aiteacher.ai.MisconceptionAgent
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.onboarding.CapabilityQuestion
@@ -107,7 +108,8 @@ object StudentModelUpdater {
     }
 
     /**
-     * Update after a study session completes. Boosts mastery slightly, refreshes recall.
+     * Update after a study session completes. Uses MemoryAgent for forgetting-curve
+     * metrics (recall, decay, next review) instead of hardcoded estimates.
      */
     suspend fun recordStudySession(
         db: AppDatabase,
@@ -121,40 +123,44 @@ object StudentModelUpdater {
         val topicId = "${subject}_${topic.lowercase().replace(" ", "_").take(40)}"
         val existing = dao.getTopic(topicId)
 
-        // Study sessions boost recall + mastery modestly
-        val prevMastery = existing?.mastery ?: 0
-        val newMastery = (prevMastery + 3).coerceIn(0, 100)        // +3% per session
-        val prevRecall = existing?.recallStrength ?: 0
-        val newRecall = (prevRecall + 5).coerceIn(0, 100)           // +5% recall boost
-
-        // Decay rate drops slightly because we just reviewed
-        val prevDecay = existing?.decayRate ?: 0.5f
-        val newDecay = (prevDecay * 0.9f).coerceIn(0.1f, 0.8f)
-
-        // Next review: 2 days out (sooner than quiz because lighter engagement)
-        val nextReview = now + (2L * 86400000L)
-
-        dao.upsert(
-            TopicKnowledgeEntity(
+        // Use MemoryAgent to handle memory metrics (forgetting curve)
+        if (existing != null) {
+            // Treat study session as a review with an estimated score of 70%
+            // (study sessions aren't graded, assume moderate recall)
+            MemoryAgent.recordReview(
+                db = db,
                 topicId = topicId,
-                subject = subject,
-                mastery = newMastery,
-                confidence = existing?.confidence ?: 40,
-                recallStrength = newRecall,
-                recognitionStrength = existing?.recognitionStrength ?: 0,
-                decayRate = newDecay,
-                lastReviewTimestamp = now,
-                nextReviewTimestamp = nextReview,
-                totalAttempts = existing?.totalAttempts ?: 0,
-                correctAttempts = existing?.correctAttempts ?: 0,
-                avgResponseTimeMs = existing?.avgResponseTimeMs ?: 0,
-                guessingTendency = existing?.guessingTendency ?: 0,
-                isUnlocked = true,
-                learningVelocity = (newMastery - prevMastery).toFloat(),
-                lastSessionDurationSec = durationSeconds,
-                streakCorrect = existing?.streakCorrect ?: 0
+                scorePercent = 70,
+                responseTimeMs = durationSeconds * 1000
             )
-        )
+            // MemoryAgent.recordReview already updates recall, decay, nextReview,
+            // mastery (+5), and confidence. No need for inline calculations.
+        } else {
+            // First-time entry for this topic
+            val newMastery = 20.coerceIn(0, 100) // initial mastery from one session
+            val newRecall = 30.coerceIn(0, 100)  // initial recall
+
+            dao.upsert(
+                TopicKnowledgeEntity(
+                    topicId = topicId,
+                    subject = subject,
+                    mastery = newMastery,
+                    confidence = 40,
+                    recallStrength = newRecall,
+                    recognitionStrength = (newRecall + 5).coerceIn(0, 100),
+                    decayRate = 0.6f,
+                    lastReviewTimestamp = now,
+                    nextReviewTimestamp = now + (2L * 86400000L),
+                    totalAttempts = 1,
+                    correctAttempts = 0,
+                    avgResponseTimeMs = durationSeconds * 1000,
+                    isUnlocked = true,
+                    learningVelocity = 20f,
+                    lastSessionDurationSec = durationSeconds,
+                    streakCorrect = 0
+                )
+            )
+        }
     }
 
     /**

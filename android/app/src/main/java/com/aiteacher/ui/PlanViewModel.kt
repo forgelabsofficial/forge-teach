@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.AiClient
+import com.aiteacher.ai.MemoryAgent
+import com.aiteacher.data.AppDatabase
 import com.aiteacher.data.PlanRepository
 import com.aiteacher.onboarding.Assessment
 import com.aiteacher.onboarding.Plan
@@ -15,9 +17,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 
 class PlanViewModel(application: Application) : AndroidViewModel(application) {
     private val repo = PlanRepository(application.applicationContext)
+    private val db = AppDatabase.getInstance(application)
     private val ctx = application.applicationContext
 
     private val _loading = MutableStateFlow(true)
@@ -46,23 +50,58 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
     private fun loadPlan() {
         viewModelScope.launch {
             _loading.value = true
-            // Load persisted completed keys first
             _completedKeys.value = withContext(Dispatchers.IO) { DataStoreUtils.loadCompletedKeys(ctx) }
 
             val existing = withContext(Dispatchers.IO) { repo.loadLatestPlan() }
             if (existing != null) {
                 _plan.value = existing
-                _sessions.value = existing.sessions
+                // Inject Memory Boost sessions for due reviews
+                val boosted = injectMemoryBoostSessions(existing.sessions)
+                _sessions.value = boosted
             } else {
                 val a = withContext(Dispatchers.IO) { DataStoreUtils.loadAssessment(ctx) }
                 _assessment.value = a
                 if (a != null) {
                     val p = withContext(Dispatchers.IO) { AiClient.generatePlan(ctx, a) }
                     _plan.value = p
-                    _sessions.value = p?.sessions ?: emptyList()
+                    _sessions.value = injectMemoryBoostSessions(p?.sessions ?: emptyList())
                 }
             }
             _loading.value = false
+        }
+    }
+
+    /**
+     * Query MemoryAgent for topics due for review and inject them as
+     * "Memory Boost" sessions at the top of the session list.
+     */
+    private suspend fun injectMemoryBoostSessions(originalSessions: List<SessionItem>): List<SessionItem> {
+        return withContext(Dispatchers.IO) {
+            val dueReviews = MemoryAgent.getDueReviews(db)
+            if (dueReviews.isEmpty()) return@withContext originalSessions
+
+            val today = LocalDate.now()
+            val reviewSessions = dueReviews.mapIndexed { idx, candidate ->
+                val dayOffset = idx / 3 // max 3 reviews per day
+                val reviewDate = today.plusDays(dayOffset.toLong())
+                val topicName = candidate.topicId
+                    .replace("_quiz", "")
+                    .replace("_baseline", "")
+                    .replace("_", " ")
+                    .replaceFirstChar { it.uppercase() }
+                SessionItem(
+                    date = reviewDate.toString(),
+                    topic = "Memory Boost — $topicName",
+                    subject = candidate.subject,
+                    duration = 15, // shorter than normal sessions
+                    topicRank = 0,
+                    isRevision = true,
+                    weaknessScore = 100 - candidate.mastery
+                )
+            }
+
+            // Prepend review sessions to the original plan
+            reviewSessions + originalSessions
         }
     }
 
@@ -97,7 +136,6 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
         val current = _completedKeys.value.toMutableSet()
         if (current.contains(key)) current.remove(key) else current.add(key)
         _completedKeys.value = current
-        // Persist immediately
         viewModelScope.launch {
             DataStoreUtils.saveCompletedKeys(ctx, current)
         }
@@ -109,7 +147,7 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
             _assessment.value?.let { a ->
                 val p = withContext(Dispatchers.IO) { AiClient.generatePlan(ctx, a) }
                 _plan.value = p
-                _sessions.value = p?.sessions ?: emptyList()
+                _sessions.value = injectMemoryBoostSessions(p?.sessions ?: emptyList())
             }
             _loading.value = false
         }
@@ -133,7 +171,7 @@ class PlanViewModel(application: Application) : AndroidViewModel(application) {
     private fun debouncedAutoSave() {
         autoSaveJob?.cancel()
         autoSaveJob = viewModelScope.launch {
-            kotlinx.coroutines.delay(1500) // 1.5s debounce
+            kotlinx.coroutines.delay(1500)
             saveCurrentPlan()
             _savedToast.value = true
             _savedToast.value = false
