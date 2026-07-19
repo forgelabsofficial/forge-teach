@@ -12,6 +12,7 @@ import com.aiteacher.data.PlanRepository
 import com.aiteacher.data.QuizResultEntity
 import com.aiteacher.model.StudentModelUpdater
 import com.aiteacher.onboarding.CapabilityQuestion
+import com.aiteacher.onboarding.RankedTopic
 import com.aiteacher.onboarding.StudentProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -125,10 +126,25 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
             val repo = PlanRepository(ctx)
             val latestPlan = repo.loadLatestPlan()
             if (latestPlan != null) {
-                // Load ranked topics — stored in the database via PlanRepository
-                // For now, WeaknessReweighter is available for when ranked topics are loaded
-                // This will be fully integrated with the agent pipeline
-                // WeaknessReweighter.reweight(rankedTopics, currentSubject, scorePercent)
+                // Build ranked topics from the plan's sessions
+                val rankedTopics = latestPlan.sessions.mapIndexed { idx, s ->
+                    RankedTopic(
+                        id = s.topic,
+                        title = s.topic,
+                        subject = s.subject,
+                        rank = idx + 1,
+                        weaknessScore = 100 - (db.topicKnowledgeDao().getTopic("${s.subject}_quiz")?.mastery ?: 50),
+                        importanceScore = 50,
+                        dependencyScore = 50,
+                        currentTermScore = 50,
+                        suggestedSessionCount = 1,
+                        dependsOn = emptyList(),
+                        isCurrentTerm = false
+                    )
+                }
+                WeaknessReweighter.reweight(rankedTopics, currentSubject, scorePercent)
+                // Note: Reweighted topics should be fed back into PlanAgent on next regeneration.
+                // Currently they are computed but not persisted — will be integrated with agent pipeline.
             }
         }
     }
