@@ -277,6 +277,8 @@ class OnboardingViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val db = AppDatabase.getInstance(context.applicationContext)
             StudentModelUpdater.seedFromCapabilityTest(db, test.questions, answers)
+            // Seed the knowledge graph with default prerequisite relationships
+            KnowledgeGraphAgent.seedDefaultGraph(db)
         }
     }
 
