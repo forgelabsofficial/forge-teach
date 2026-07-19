@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.CapabilityTestClient
+import com.aiteacher.ai.ReflectionAgent
 import com.aiteacher.ai.WeaknessReweighter
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
@@ -146,6 +147,17 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 // Note: Reweighted topics should be fed back into PlanAgent on next regeneration.
                 // Currently they are computed but not persisted — will be integrated with agent pipeline.
             }
+
+            // ReflectionAgent: update student model after quiz
+            ReflectionAgent.reflect(
+                db = db,
+                subject = currentSubject,
+                topic = currentTopic,
+                scorePercent = scorePercent,
+                responseTimeMs = timeSec * 1000,
+                isGraded = true,
+                activityType = "quiz"
+            )
         }
     }
 

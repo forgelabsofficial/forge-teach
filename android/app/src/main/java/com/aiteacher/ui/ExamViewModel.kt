@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.CapabilityTestClient
+import com.aiteacher.ai.ReflectionAgent
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.data.ExamResultEntity
@@ -165,6 +166,19 @@ class ExamViewModel(application: Application) : AndroidViewModel(application) {
                 selectedAnswers = answers,
                 avgResponseTimeMs = (cfg.durationMinutes * 60 - _remainingSeconds.value) * 1000
             )
+
+            // ReflectionAgent: update per-subject student model
+            subjectMap.forEach { (subject, subScore) ->
+                ReflectionAgent.reflect(
+                    db = db,
+                    subject = subject,
+                    topic = "${subject}_exam",
+                    scorePercent = subScore,
+                    responseTimeMs = (cfg.durationMinutes * 60 - _remainingSeconds.value) * 1000 / subjectMap.size,
+                    isGraded = true,
+                    activityType = "exam"
+                )
+            }
         }
     }
 

@@ -3,6 +3,7 @@ package com.aiteacher.ui
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.aiteacher.ai.ReflectionAgent
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
 import com.aiteacher.data.PlanRepository
@@ -117,16 +118,13 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                         catch (_: Exception) { false }
                     } ?: 0
 
-                    // Subject scores — blend TopicKnowledge model mastery with quiz results
                     val quizDao = db.quizResultDao()
                     val allQuizResults = quizDao.getAll()
                     val quizSubjectMap = allQuizResults.groupBy { it.subject }
                         .mapValues { (_, results) -> results.map { it.scorePercent }.average().toInt() }
 
-                    // Read from student model (TopicKnowledge) — these are more accurate
                     val modelSubjectMap = StudentModelUpdater.getAllSubjectMasteries(db)
 
-                    // Blend: model takes priority (60%), quiz results backfill (40%)
                     val allSubjects = (quizSubjectMap.keys + modelSubjectMap.keys).toSet()
                     val subjectMap = allSubjects.mapNotNull { subject ->
                         val modelScore = modelSubjectMap[subject]
@@ -140,7 +138,6 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
                         blended?.let { subject to it }
                     }.toMap()
 
-                    // Today's focus: highest-rank upcoming session
                     val focus = p?.sessions?.filter {
                         try { OffsetDateTime.parse(it.isoDateTime ?: it.date).toInstant().isAfter(Instant.now()) }
                         catch (_: Exception) { true }
@@ -213,13 +210,15 @@ class DashboardViewModel(application: Application) : AndroidViewModel(applicatio
             DataStoreUtils.recordActivity(ctx, xp)
             _totalXp.value += xp
 
-            // Update student model with study session
-            StudentModelUpdater.recordStudySession(
+            // ReflectionAgent: update student model after study session
+            ReflectionAgent.reflect(
                 db = db,
                 subject = session.subject,
                 topic = session.topic,
-                durationSeconds = elapsed,
-                xpEarned = xp
+                scorePercent = 70, // ungraded session = estimated recall
+                responseTimeMs = elapsed * 1000,
+                isGraded = false,
+                activityType = "study"
             )
         }
         _activeSession.value = null
