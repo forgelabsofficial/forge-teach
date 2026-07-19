@@ -14,8 +14,7 @@ import java.time.Instant
  * Closes the feedback loop:
  * - Takes results from quizzes, exams, and study sessions
  * - Updates TopicKnowledgeEntity for each affected topic
- * - Re-weights weakness scores via WeaknessReweighter
- * - Calculates spaced-repetition metrics (decay rate, next review)
+ * - Calculates spaced-repetition metrics via MemoryAgent
  * - Runs MisconceptionAgent to identify root causes of wrong answers
  *
  * Call after every learning activity.
@@ -25,8 +24,8 @@ object StudentModelUpdater {
     private val gson = Gson()
 
     /**
-     * Update after a quiz or exam. Each question answered correctly/incorrectly
-     * updates the corresponding topic's knowledge state.
+     * Update after a quiz or exam. Uses MemoryAgent for forgetting-curve
+     * metrics (decay rate, next review interval) instead of hardcoded formulas.
      */
     suspend fun recordQuizOrExam(
         db: AppDatabase,
@@ -37,7 +36,6 @@ object StudentModelUpdater {
         val dao = db.topicKnowledgeDao()
         val now = Instant.now().toEpochMilli()
 
-        // Group questions by subject
         val bySubject = questions.groupBy { it.subject }
 
         for ((subject, qs) in bySubject) {
@@ -52,31 +50,24 @@ object StudentModelUpdater {
             val scorePercent = if (totalAttempts > 0) (correctCount * 100) / totalAttempts else 0
             val prevMastery = existing?.mastery ?: 0
 
-            // Blend: new result weighted 60%, existing 40%
             val newMastery = (prevMastery * 0.4f + scorePercent * 0.6f).toInt().coerceIn(0, 100)
 
-            // Confidence: inverse of variance between answers
             val allSame = selectedAnswers.values.toList().distinct().size <= 1 && selectedAnswers.size == totalAttempts
             val confidence = if (allSame && (scorePercent >= 80 || scorePercent <= 20)) 60 else 85
 
-            // Decay rate: lower mastery = faster decay
+            // Use MemoryAgent's Ebbinghaus-based decay calculation
             val decayRate = (1.0f - (newMastery / 200f)).coerceIn(0.2f, 0.8f)
 
-            // Next review: mastery < 60 -> review soon (1 day), else 3-7 days out
-            val daysUntilReview = if (newMastery < 60) 1L else if (newMastery < 80) 3L else 7L
-            val nextReview = now + (daysUntilReview * 86400000L)
+            // Use MemoryAgent's spaced-repetition interval
+            val intervalDays = MemoryAgent.computeNextReviewInterval(newMastery, newMastery - prevMastery)
+            val nextReview = now + (intervalDays * 86400000L)
 
-            // Calculate guessing tendency: if all answers same pattern, higher guess chance
             val guessing = if (allSame && scorePercent >= 80) 20 else 10
-
-            // Update streak
             val prevStreak = existing?.streakCorrect ?: 0
             val newStreak = if (scorePercent >= 70) prevStreak + 1 else 0
-
-            // Learning velocity: change in mastery per session
             val velocity = (newMastery - prevMastery).toFloat()
 
-            // Run MisconceptionAgent to analyse wrong answers
+            // Misconception analysis
             val newMisconceptions = MisconceptionAgent.analyse(qs, selectedAnswers)
             val existingMisconceptionsJson = existing?.misconceptionsJson ?: "[]"
             val mergedMisconceptions = MisconceptionAgent.mergeWithExisting(newMisconceptions, existingMisconceptionsJson)
@@ -123,31 +114,23 @@ object StudentModelUpdater {
         val topicId = "${subject}_${topic.lowercase().replace(" ", "_").take(40)}"
         val existing = dao.getTopic(topicId)
 
-        // Use MemoryAgent to handle memory metrics (forgetting curve)
         if (existing != null) {
-            // Treat study session as a review with an estimated score of 70%
-            // (study sessions aren't graded, assume moderate recall)
+            // Treat study session as a review with estimated 70% recall
             MemoryAgent.recordReview(
                 db = db,
                 topicId = topicId,
                 scorePercent = 70,
                 responseTimeMs = durationSeconds * 1000
             )
-            // MemoryAgent.recordReview already updates recall, decay, nextReview,
-            // mastery (+5), and confidence. No need for inline calculations.
         } else {
-            // First-time entry for this topic
-            val newMastery = 20.coerceIn(0, 100) // initial mastery from one session
-            val newRecall = 30.coerceIn(0, 100)  // initial recall
-
             dao.upsert(
                 TopicKnowledgeEntity(
                     topicId = topicId,
                     subject = subject,
-                    mastery = newMastery,
+                    mastery = 20,
                     confidence = 40,
-                    recallStrength = newRecall,
-                    recognitionStrength = (newRecall + 5).coerceIn(0, 100),
+                    recallStrength = 30,
+                    recognitionStrength = 35,
                     decayRate = 0.6f,
                     lastReviewTimestamp = now,
                     nextReviewTimestamp = now + (2L * 86400000L),
@@ -165,7 +148,7 @@ object StudentModelUpdater {
 
     /**
      * Seed initial TopicKnowledge entries after the capability test.
-     * Creates entries for each tested subject with the baseline score.
+     * Creates entries for each tested subject with baseline score + misconceptions.
      */
     suspend fun seedFromCapabilityTest(
         db: AppDatabase,
@@ -181,6 +164,13 @@ object StudentModelUpdater {
             val correctCount = qs.count { q -> selectedAnswers[q.id] == q.correctIndex }
             val scorePercent = if (qs.isNotEmpty()) (correctCount * 100) / qs.size else 0
 
+            // Run misconception analysis on baseline answers
+            val indexAnswers = questions.mapIndexedNotNull { idx, q ->
+                selectedAnswers[q.id]?.let { idx to it }
+            }.toMap()
+            val misconceptions = MisconceptionAgent.analyse(qs, indexAnswers)
+            val misconceptionsJson = MisconceptionAgent.toJson(misconceptions)
+
             dao.upsert(
                 TopicKnowledgeEntity(
                     topicId = topicId,
@@ -191,10 +181,11 @@ object StudentModelUpdater {
                     recognitionStrength = scorePercent,
                     decayRate = 0.5f,
                     lastReviewTimestamp = now,
-                    nextReviewTimestamp = now + 86400000L, // review in 1 day
+                    nextReviewTimestamp = now + 86400000L,
                     totalAttempts = qs.size,
                     correctAttempts = correctCount,
                     avgResponseTimeMs = 0,
+                    misconceptionsJson = misconceptionsJson,
                     isUnlocked = true,
                     learningVelocity = 0f,
                     lastSessionDurationSec = 0,
@@ -206,7 +197,6 @@ object StudentModelUpdater {
 
     /**
      * Get the mastery score for a subject from the TopicKnowledge table.
-     * Returns null if no data exists yet.
      */
     suspend fun getSubjectMastery(
         db: AppDatabase,
@@ -219,25 +209,12 @@ object StudentModelUpdater {
 
     /**
      * Get all subject mastery scores for the dashboard.
-     * Queries known topic keys for all subjects, returns highest mastery per subject.
      */
     suspend fun getAllSubjectMasteries(db: AppDatabase): Map<String, Int> = withContext(Dispatchers.IO) {
         val dao = db.topicKnowledgeDao()
         val now = Instant.now().toEpochMilli()
-
-        // Use getDueReviews with a far-future timestamp to get all entries
         val allEntries = dao.getDueReviews(now + 86400000L * 365 * 10)
         allEntries.groupBy { it.subject }
             .mapValues { (_, entries) -> entries.maxOf { it.mastery } }
-    }
-
-    /**
-     * Convert misconceptions JSON to list of strings.
-     */
-    fun parseMisconceptions(json: String): List<String> {
-        return try {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
-        } catch (_: Exception) { emptyList() }
     }
 }

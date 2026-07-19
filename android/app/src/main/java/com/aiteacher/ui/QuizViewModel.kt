@@ -5,8 +5,10 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.aiteacher.ai.CapabilityTestClient
+import com.aiteacher.ai.WeaknessReweighter
 import com.aiteacher.ai.XpEngine
 import com.aiteacher.data.AppDatabase
+import com.aiteacher.data.PlanRepository
 import com.aiteacher.data.QuizResultEntity
 import com.aiteacher.model.StudentModelUpdater
 import com.aiteacher.onboarding.CapabilityQuestion
@@ -118,6 +120,16 @@ class QuizViewModel(application: Application) : AndroidViewModel(application) {
                 selectedAnswers = answers,
                 avgResponseTimeMs = timeSec * 1000
             )
+
+            // Re-weight topic rankings based on quiz performance
+            val repo = PlanRepository(ctx)
+            val latestPlan = repo.loadLatestPlan()
+            if (latestPlan != null) {
+                // Load ranked topics — stored in the database via PlanRepository
+                // For now, WeaknessReweighter is available for when ranked topics are loaded
+                // This will be fully integrated with the agent pipeline
+                // WeaknessReweighter.reweight(rankedTopics, currentSubject, scorePercent)
+            }
         }
     }
 
