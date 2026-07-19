@@ -37,14 +37,15 @@ fun DashboardScreen(
     val vm: DashboardViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
     val plan by vm.plan.collectAsState()
     val studentName by vm.studentName.collectAsState()
-    val completedCount by vm.completedCount.collectAsState()
-    val totalCount by vm.totalCount.collectAsState()
+    val streak by vm.streak.collectAsState()
+    val totalXp by vm.totalXp.collectAsState()
     val loading by vm.loading.collectAsState()
     val error by vm.error.collectAsState()
+    val weekComp by vm.weekComparison.collectAsState()
+    val mentorMsg by vm.mentorMessage.collectAsState()
+    val subjectScores by vm.subjectScores.collectAsState()
     val ctx = LocalContext.current
 
-    val totalXp by vm.totalXp.collectAsState()
-    val streak by vm.streak.collectAsState()
     val level = XpEngine.levelFromXp(totalXp)
     val levelProgress = XpEngine.progressInLevel(totalXp)
 
@@ -65,6 +66,14 @@ fun DashboardScreen(
         )
         greetings.random()
     }
+
+    // ── Mentor message animation ─────────────────────────────────────────────
+    val infiniteTransition = rememberInfiniteTransition(label = "mentorPulse")
+    val mentorGlow by infiniteTransition.animateFloat(
+        initialValue = 0.06f, targetValue = 0.15f,
+        animationSpec = infiniteRepeatable(tween(2000, easing = FastOutSlowInEasing), RepeatMode.Reverse),
+        label = "mentorGlow"
+    )
 
     ForgeBackground {
         if (error != null) {
@@ -104,7 +113,6 @@ fun DashboardScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    // Avatar
                     Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(14.dp))
                         .background(Brush.linearGradient(listOf(ForgeBrand.Orange, ForgeBrand.OrangeDark))),
                         contentAlignment = Alignment.Center) {
@@ -119,17 +127,36 @@ fun DashboardScreen(
                     }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    // Level badge
                     Box(modifier = Modifier.clip(RoundedCornerShape(10.dp))
                         .background(ForgeBrand.Orange.copy(alpha = 0.15f))
                         .padding(horizontal = 8.dp, vertical = 4.dp)) {
                         Text("Lv.$level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = ForgeBrand.OrangeLight)
                     }
-                    // Streak
                     if (streak >= 2) {
                         Text("🔥$streak", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                             color = ForgeBrand.Warning)
+                    }
+                }
+            }
+
+            // ─── AI Mentor Message Card ──────────────────────────────────────
+            Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(18.dp))
+                .background(ForgeBrand.Orange.copy(alpha = mentorGlow))
+                .border(1.dp, ForgeBrand.Orange.copy(alpha = 0.2f), RoundedCornerShape(18.dp))) {
+                Row(modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.Top) {
+                    Box(modifier = Modifier.size(36.dp).clip(CircleShape)
+                        .background(ForgeBrand.Orange.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center) {
+                        Text("🧠", style = MaterialTheme.typography.titleMedium)
+                    }
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("AI Mentor", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                            color = ForgeBrand.OrangeLight)
+                        Text(mentorMsg, style = MaterialTheme.typography.bodyMedium,
+                            color = forgeColors.textPrimary)
                     }
                 }
             }
@@ -163,7 +190,6 @@ fun DashboardScreen(
                     ))) {
                     Column(modifier = Modifier.padding(24.dp).fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        // Mission header
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                             Text(missionEmoji, style = MaterialTheme.typography.titleLarge)
                             Surface(shape = RoundedCornerShape(20.dp), color = Color.White.copy(alpha = 0.15f)) {
@@ -177,11 +203,14 @@ fun DashboardScreen(
                         Text(missionSubtitle, style = MaterialTheme.typography.bodyLarge,
                             color = Color.White.copy(alpha = 0.9f))
 
-                        // Progress bar + duration
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             LinearProgressIndicator(
-                                progress = if (totalCount > 0) completedCount.toFloat() / totalCount else 0f,
+                                progress = if (plan?.sessions?.isNotEmpty() == true)
+                                    plan!!.sessions.count { s ->
+                                        try { OffsetDateTime.parse(s.isoDateTime ?: s.date).toInstant().isBefore(Instant.now()) }
+                                        catch (_: Exception) { false }
+                                    }.toFloat() / plan!!.sessions.size else 0f,
                                 modifier = Modifier.weight(1f).height(6.dp).clip(RoundedCornerShape(3.dp)),
                                 color = Color.White.copy(alpha = 0.8f), trackColor = Color.White.copy(alpha = 0.2f)
                             )
@@ -189,7 +218,6 @@ fun DashboardScreen(
                                 color = Color.White.copy(alpha = 0.8f))
                         }
 
-                        // Reward row
                         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -205,7 +233,6 @@ fun DashboardScreen(
                             }
                         }
 
-                        // CTA button
                         Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))
                             .background(Color.White.copy(alpha = 0.2f))
                             .clickable { onNavigateToPlan() }
@@ -216,33 +243,69 @@ fun DashboardScreen(
                         }
                     }
                 }
+            }
 
-                // ─── XP progress bar (thin, below hero) ──────────────────────
-                GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
-                    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("⭐", style = MaterialTheme.typography.titleSmall)
-                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text("Level $level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = forgeColors.textPrimary)
-                                Text("$totalXp / ${(level) * 200} XP", style = MaterialTheme.typography.labelSmall,
-                                    color = forgeColors.textMuted)
-                            }
-                            LinearProgressIndicator(progress = levelProgress,
-                                modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
-                                color = ForgeBrand.Orange, trackColor = forgeColors.glassBorder)
+            // ─── XP progress bar ──────────────────────────────────────────────
+            GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp)) {
+                Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp).fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("⭐", style = MaterialTheme.typography.titleSmall)
+                    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text("Level $level", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                                color = forgeColors.textPrimary)
+                            Text("$totalXp / ${level * 200} XP", style = MaterialTheme.typography.labelSmall,
+                                color = forgeColors.textMuted)
                         }
+                        LinearProgressIndicator(progress = levelProgress,
+                            modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(2.dp)),
+                            color = ForgeBrand.Orange, trackColor = forgeColors.glassBorder)
+                    }
+                }
+            }
+
+            // ─── This Week vs Last Week ─────────────────────────────────────
+            GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Your Growth", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                        color = forgeColors.textSecondary)
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        GrowthMetric(
+                            label = "Sessions",
+                            current = weekComp.thisWeekSessions.toString(),
+                            previous = weekComp.lastWeekSessions.toString(),
+                            change = weekComp.sessionChange
+                        )
+                        GrowthMetric(
+                            label = "Minutes",
+                            current = "${weekComp.thisWeekMinutes}",
+                            previous = "${weekComp.lastWeekMinutes}",
+                            change = weekComp.minuteChange
+                        )
+                        GrowthMetric(
+                            label = "XP",
+                            current = "${weekComp.thisWeekXp}",
+                            previous = "${weekComp.lastWeekXp}",
+                            change = weekComp.xpChange
+                        )
+                    }
+
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                        Text(
+                            text = if (weekComp.sessionChange >= 0f) "📈 This week beats last week" else "📉 This week lags behind last",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (weekComp.sessionChange >= 0f) ForgeBrand.Success else forgeColors.textMuted
+                        )
                     }
                 }
             }
 
             // ─── Subject mastery bars ──────────────────────────────────────────
-            val subjectScores by vm.subjectScores.collectAsState()
             if (subjectScores.isNotEmpty()) {
                 GlassCard(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp)) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Text("This Week", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                        Text("Subject Progress", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                             color = forgeColors.textSecondary)
                         subjectScores.entries.take(4).forEach { (subject, score) ->
                             val world = when {
@@ -269,7 +332,7 @@ fun DashboardScreen(
                 }
             }
 
-            // ─── Next Unlocks (horizontal card stack) ─────────────────────────
+            // ─── Next Unlocks ─────────────────────────────────────────────────
             if (nextSessions.isNotEmpty()) {
                 Text("Next Unlocks", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                     color = forgeColors.textSecondary)
@@ -312,5 +375,33 @@ fun DashboardScreen(
 
             Spacer(Modifier.height(8.dp))
         }
+    }
+}
+
+@Composable
+private fun GrowthMetric(
+    label: String,
+    current: String,
+    previous: String,
+    change: Float
+) {
+    val changeEmoji = when {
+        change > 0.05f -> "↑"
+        change < -0.05f -> "↓"
+        else -> "→"
+    }
+    val changeColor = when {
+        change > 0.05f -> ForgeBrand.Success
+        change < -0.05f -> ForgeBrand.Error
+        else -> forgeColors.textMuted
+    }
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, style = MaterialTheme.typography.labelSmall, color = forgeColors.textMuted)
+        Text(current, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Black),
+            color = forgeColors.textPrimary)
+        Text("$changeEmoji $previous",
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+            color = changeColor)
     }
 }
