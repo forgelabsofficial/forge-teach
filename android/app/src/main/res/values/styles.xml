@@ -2,8 +2,7 @@
 <resources>
     <string name="app_name">AI Teacher</string>
 
-    <!-- Base app theme: lets Compose handle all UI; Action Bar hidden -->
+    <!-- Base app theme for Jetpack Compose -->
     <style name="Theme.AITeacher" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Compose draws everything, so no additional theme attributes needed -->
     </style>
 </resources>
