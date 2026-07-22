@@ -35,7 +35,8 @@ jobs:
       # 5. Install Gradle and generate the wrapper jar
       - name: Generate Gradle wrapper
         run: |
-          # Install gradle via apt
+          # Refresh package list first (required on GH runners — stale by default)
+          sudo apt-get update -y
           sudo apt-get install -y gradle
           cd android
           gradle wrapper --gradle-version 8.5 --distribution-type bin

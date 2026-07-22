@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="AI Teacher"
+        android:theme="@style/Theme.AITeacher"
         android:allowBackup="true"
         android:enableOnBackInvokedCallback="true">
         <activity android:name=".MainActivity"
