@@ -12,9 +12,10 @@ import androidx.room.RoomDatabase
         QuizResultEntity::class, ExamResultEntity::class, StudySessionEntity::class,
         com.aiteacher.model.TopicKnowledgeEntity::class,
         com.aiteacher.model.KnowledgeGraphNode::class,
-        com.aiteacher.model.KnowledgeGraphEdge::class
+        com.aiteacher.model.KnowledgeGraphEdge::class,
+        com.aiteacher.model.MentorMemoryEntity::class
     ],
-    version = 6
+    version = 7
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun planDao(): PlanDao
@@ -25,6 +26,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun studySessionDao(): StudySessionDao
     abstract fun topicKnowledgeDao(): com.aiteacher.model.TopicKnowledgeDao
     abstract fun knowledgeGraphDao(): com.aiteacher.model.KnowledgeGraphDao
+    abstract fun mentorMemoryDao(): com.aiteacher.model.MentorMemoryDao
 
     companion object {
         private const val DB_NAME = "aiteacher.db"
@@ -72,10 +74,16 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_6_7 = object : androidx.room.migration.Migration(6, 7) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `mentor_memory` (`memoryKey` TEXT NOT NULL PRIMARY KEY, `category` TEXT NOT NULL, `content` TEXT NOT NULL, `importanceScore` INTEGER NOT NULL DEFAULT 50, `updatedTimestamp` INTEGER NOT NULL)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val inst = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                     .build()
                 INSTANCE = inst
                 inst

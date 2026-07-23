@@ -46,7 +46,7 @@ fun MainScreen() {
         val scope = rememberCoroutineScope()
         val ctx = LocalContext.current
         val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
-        val bottomNavRoutes = setOf("dashboard", "plan", "quiz/_/_", "profile", "settings")
+        val bottomNavRoutes = setOf("dashboard", "plan", "worlds", "quiz/_/_", "profile", "settings")
         var startDest by remember { mutableStateOf<String?>(null) }
 
         LaunchedEffect(Unit) {
@@ -83,6 +83,13 @@ fun MainScreen() {
                                         popUpTo("dashboard") { inclusive = true }
                                     }
                                 })
+                            }
+                            composable("worlds") {
+                                LearningWorldsScreen(
+                                    onSelectTopic = { subject, topic ->
+                                        navController.navigate("quiz/${subject.ifBlank { "_" }}/${topic.ifBlank { "_" }}")
+                                    }
+                                )
                             }
                             composable("dashboard") {
                                 DashboardScreen(
@@ -191,6 +198,12 @@ private fun ForgeNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
                     modifier = Modifier.size(22.dp).wrapContentSize(Alignment.Center)) },
                 label = "Plan", selected = currentRoute == "plan",
                 onClick = { onNavigate("plan") })
+
+            ForgeNavItem(icon = {
+                Text("🗺️", style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.size(22.dp).wrapContentSize(Alignment.Center)) },
+                label = "Worlds", selected = currentRoute == "worlds",
+                onClick = { onNavigate("worlds") })
 
             ForgeNavItem(icon = {
                 Text("⭐", style = MaterialTheme.typography.titleMedium,
