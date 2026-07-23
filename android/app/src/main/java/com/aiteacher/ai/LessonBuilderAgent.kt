@@ -24,30 +24,32 @@ object LessonBuilderAgent {
     private val lessonCache = mutableMapOf<String, Lesson>()
 
     /**
-     * Get a lesson plan for a topic. First tries the built-in library,
-     * then falls back to AI generation, then a generic template.
+     * Get a lesson plan for a topic adapted to the student's detected learning style.
+     * First tries the built-in library, then falls back to AI generation, then a generic template.
      */
     suspend fun getLesson(
         context: Context,
         db: AppDatabase,
         topicId: String,
         subject: String,
-        topicTitle: String
+        topicTitle: String,
+        learningStyle: String = "analogy"
     ): Lesson = withContext(Dispatchers.IO) {
+        val cacheKey = "${topicId}_$learningStyle"
         // Check cache
-        lessonCache[topicId]?.let { return@withContext it }
+        lessonCache[cacheKey]?.let { return@withContext it }
 
         // Try built-in library
         val builtIn = builtInLessons[topicId]
         if (builtIn != null) {
-            lessonCache[topicId] = builtIn
+            lessonCache[cacheKey] = builtIn
             return@withContext builtIn
         }
 
         // Try AI generation
         try {
-            val aiLesson = generateWithAi(context, topicId, subject, topicTitle)
-            lessonCache[topicId] = aiLesson
+            val aiLesson = generateWithAi(context, topicId, subject, topicTitle, learningStyle)
+            lessonCache[cacheKey] = aiLesson
             return@withContext aiLesson
         } catch (_: Exception) {}
 
@@ -60,11 +62,11 @@ object LessonBuilderAgent {
                 Concept("Core Idea", "Study the core principles of $topicTitle with examples.", emptyList())
             ),
             exercises = listOf(
-                Exercise("Practice 1", "Try applying what you've learned about $topicTitle.", "medium")
+                Exercise("Practice 1", "Try applying what you've learned about $topicTitle in a novel scenario.", "medium")
             ),
             exitQuestion = "What is the most important thing you learned about $topicTitle?"
         )
-        lessonCache[topicId] = fallback
+        lessonCache[cacheKey] = fallback
         fallback
     }
 
@@ -72,22 +74,24 @@ object LessonBuilderAgent {
         context: Context,
         topicId: String,
         subject: String,
-        topicTitle: String
+        topicTitle: String,
+        learningStyle: String
     ): Lesson {
         // Use AiClient for AI-generated lesson content
         val prompt = """
-Create a structured lesson plan for the topic "$topicTitle" (subject: $subject).
+Create a structured lesson plan for "$topicTitle" ($subject) adapted to learning style: $learningStyle.
+
+IMPORTANT TRANSFER RULE:
+Exercises MUST NOT reuse numbers, names, or contexts from the concept examples.
+Force the student to apply the underlying principle to a novel scenario to prevent pattern-copying.
 
 Return ONLY valid JSON with this structure:
 {
-  "objectives": ["obj1", "obj2", "obj3"],
+  "objectives": ["obj1", "obj2"],
   "concepts": [{"title": "...", "explanation": "...", "examples": ["..."]}],
   "exercises": [{"title": "...", "description": "...", "difficulty": "easy|medium|hard"}],
   "exitQuestion": "..."
 }
-
-Include 2-3 learning objectives, 2-3 key concepts with 1-2 examples each,
-2-3 practice exercises at mixed difficulty, and one exit question.
         """.trimIndent()
 
         // Return a generated lesson

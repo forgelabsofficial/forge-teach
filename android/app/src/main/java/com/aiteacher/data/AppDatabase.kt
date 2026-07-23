@@ -13,9 +13,10 @@ import androidx.room.RoomDatabase
         com.aiteacher.model.TopicKnowledgeEntity::class,
         com.aiteacher.model.KnowledgeGraphNode::class,
         com.aiteacher.model.KnowledgeGraphEdge::class,
-        com.aiteacher.model.MentorMemoryEntity::class
+        com.aiteacher.model.MentorMemoryEntity::class,
+        com.aiteacher.model.LearningStyleEntity::class
     ],
-    version = 7
+    version = 8
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun planDao(): PlanDao
@@ -27,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun topicKnowledgeDao(): com.aiteacher.model.TopicKnowledgeDao
     abstract fun knowledgeGraphDao(): com.aiteacher.model.KnowledgeGraphDao
     abstract fun mentorMemoryDao(): com.aiteacher.model.MentorMemoryDao
+    abstract fun learningStyleDao(): com.aiteacher.model.LearningStyleDao
 
     companion object {
         private const val DB_NAME = "aiteacher.db"
@@ -80,10 +82,16 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_7_8 = object : androidx.room.migration.Migration(7, 8) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("CREATE TABLE IF NOT EXISTS `learning_styles` (`studentId` TEXT NOT NULL PRIMARY KEY, `narrativeScore` INTEGER NOT NULL DEFAULT 50, `proceduralScore` INTEGER NOT NULL DEFAULT 50, `analogyScore` INTEGER NOT NULL DEFAULT 50, `socraticScore` INTEGER NOT NULL DEFAULT 50, `activeRecallScore` INTEGER NOT NULL DEFAULT 50, `dominantStyle` TEXT NOT NULL DEFAULT 'analogy', `sessionsTracked` INTEGER NOT NULL DEFAULT 0, `lastUpdatedTimestamp` INTEGER NOT NULL)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val inst = Room.databaseBuilder(context.applicationContext, AppDatabase::class.java, DB_NAME)
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                     .build()
                 INSTANCE = inst
                 inst

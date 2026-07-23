@@ -87,7 +87,7 @@ fun MainScreen() {
                             composable("worlds") {
                                 LearningWorldsScreen(
                                     onSelectTopic = { subject, topic ->
-                                        navController.navigate("quiz/${subject.ifBlank { "_" }}/${topic.ifBlank { "_" }}")
+                                        navController.navigate("lesson/${subject.ifBlank { "_" }}/${topic.ifBlank { "_" }}")
                                     }
                                 )
                             }
@@ -95,9 +95,18 @@ fun MainScreen() {
                                 DashboardScreen(
                                     onNavigateToPlan = { navController.navigate("plan") },
                                     onNavigateToQuiz = { subject, topic ->
-                                        navController.navigate("quiz/${subject.ifBlank { "_" }}/${topic.ifBlank { "_" }}")
+                                        navController.navigate("lesson/${subject.ifBlank { "_" }}/${topic.ifBlank { "_" }}")
                                     },
                                     onNavigateToExam = { navController.navigate("exam") }
+                                )
+                            }
+                            composable("lesson/{subject}/{topic}") { backStackEntry ->
+                                val subject = backStackEntry.arguments?.getString("subject")?.let { if (it == "_") "" else it } ?: ""
+                                val topic = backStackEntry.arguments?.getString("topic")?.let { if (it == "_") "" else it } ?: ""
+                                LessonScreen(
+                                    subject = subject,
+                                    topic = topic,
+                                    onFinished = { navController.navigateUp() }
                                 )
                             }
                             composable("quiz/{subject}/{topic}") { backStackEntry ->
