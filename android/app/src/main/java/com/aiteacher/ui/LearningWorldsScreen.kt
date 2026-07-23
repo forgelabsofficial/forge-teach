@@ -161,7 +161,7 @@ fun LearningWorldCard(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, world.accentColor.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(containerColor = forgeColors.surfaceElevated.copy(alpha = 0.7f)),
+        colors = CardDefaults.cardColors(containerColor = forgeColors.bgCard.copy(alpha = 0.7f)),
         shape = RoundedCornerShape(20.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
