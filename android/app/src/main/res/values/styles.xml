@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">AI Teacher</string>
 
-    <!-- Base app theme for Jetpack Compose -->
-    <style name="Theme.AITeacher" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Base app theme for Jetpack Compose without requiring Material3 XML library dependency -->
+    <style name="Theme.AITeacher" parent="android:Theme.Material.Light.NoActionBar">
     </style>
 </resources>
