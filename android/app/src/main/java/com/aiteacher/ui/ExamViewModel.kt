@@ -168,13 +168,13 @@ class ExamViewModel(application: Application) : AndroidViewModel(application) {
             )
 
             // ReflectionAgent: update per-subject student model
-            subjectMap.forEach { (subject, subScore) ->
+            subjectScores.forEach { (subject, subScore) ->
                 ReflectionAgent.reflect(
                     db = db,
                     subject = subject,
                     topic = "${subject}_exam",
                     scorePercent = subScore,
-                    responseTimeMs = (cfg.durationMinutes * 60 - _remainingSeconds.value) * 1000 / subjectMap.size,
+                    responseTimeMs = if (subjectScores.isNotEmpty()) (cfg.durationMinutes * 60 - _remainingSeconds.value) * 1000 / subjectScores.size else 0,
                     isGraded = true,
                     activityType = "exam"
                 )

@@ -7,6 +7,7 @@ import com.aiteacher.ai.AgentEvent
 import com.aiteacher.ai.AgentMemory
 import com.aiteacher.ai.AgentPipeline
 import com.aiteacher.ai.CapabilityTestClient
+import com.aiteacher.ai.KnowledgeGraphAgent
 import com.aiteacher.ai.ModelInfo
 import com.aiteacher.ai.ModelRegistry
 import com.aiteacher.data.AppDatabase

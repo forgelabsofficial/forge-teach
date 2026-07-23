@@ -58,14 +58,15 @@ object StudentModelUpdater {
             // Use MemoryAgent's Ebbinghaus-based decay calculation
             val decayRate = (1.0f - (newMastery / 200f)).coerceIn(0.2f, 0.8f)
 
+            val velocity = (newMastery - prevMastery).toFloat()
+
             // Use MemoryAgent's spaced-repetition interval
-            val intervalDays = MemoryAgent.computeNextReviewInterval(newMastery, newMastery - prevMastery)
+            val intervalDays = MemoryAgent.computeNextReviewInterval(newMastery, velocity)
             val nextReview = now + (intervalDays * 86400000L)
 
             val guessing = if (allSame && scorePercent >= 80) 20 else 10
             val prevStreak = existing?.streakCorrect ?: 0
             val newStreak = if (scorePercent >= 70) prevStreak + 1 else 0
-            val velocity = (newMastery - prevMastery).toFloat()
 
             // Misconception analysis
             val newMisconceptions = MisconceptionAgent.analyse(qs, selectedAnswers)
